@@ -142,6 +142,38 @@ HTML era except **Legacy**.
 | Experience | era transitions (soft prestige) | permanent multipliers (this career) |
 | Legacy | ascension (hard prestige) | permanent perk tree (all careers) |
 
+## Visuals & assets: "your screen is the game"
+
+No characters, no world — everything renders as software the developer is
+looking at. The art is CSS, typography, and UI chrome; near-zero image
+assets.
+
+- **Core aesthetic:** terminal/IDE (the v0 look). Typing pane = editor,
+  ticket board = issue tracker, currencies = status bar.
+- **Eras are visual skins:** each era retints the whole UI via CSS-variable
+  themes. HTML era = Geocities grey bevels + Times chrome + visitor counter;
+  PHP era = phpBB beige/blue gradients; JS era = early-2010s flat; SPA era =
+  modern dark IDE; AI era = chat-product minimalism, purple gradients,
+  sparkles — slightly too clean on purpose.
+- **WordBuildr™ deliberately clashes** with every era theme: bright white
+  corporate SaaS, cheerful mascot, drop shadows. Visual whiplash is the joke.
+- **Assets policy:** inline SVG icons (hand-rolled or embedded Lucide) +
+  unicode; one self-hosted monospace (JetBrains Mono / Fira Code) with
+  per-era system-font stacks for chrome; no photos — WordBuildr site
+  previews are CSS blocks; tiny data-URI patterns if texture is needed.
+  No canvas/WebGL/sprite sheets — DOM + CSS only.
+- **Juice carries game-feel:** floating `+N LoC` numbers, combo glow, crit
+  flash, completion sweep, deprecation news-ticker, rage-meter shake — all
+  CSS/JS animation through a small centralized effects layer (so flavor
+  text on effects is editable). `prefers-reduced-motion` respected from the
+  start.
+- **Sound:** later, default-muted; if added, tiny WebAudio-synthesized
+  keyboard thock / cash ding, no audio files.
+- **Theming discipline:** components consume semantic CSS variables only
+  (`--panel`, `--accent`, `--text-dim`); era themes redefine variables and
+  add a few decorations, never restyle components — keeps 5 themes × all
+  components testable.
+
 ## Build order
 
 1. Design doc + data model refactor (tickets, clients, eras as data).
