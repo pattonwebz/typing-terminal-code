@@ -178,24 +178,24 @@ awful visual builder instead of the typing pane.
 
 **Tasks:**
 
-- [ ] WordBuildr UI shell: fake builder chrome — panels, accordions,
+- [x] WordBuildr UI shell: fake builder chrome — panels, accordions,
       toolbar, canvas preview of a tacky client site. Visually clashes
       with every era theme on purpose: bright white corporate SaaS,
       cheerful mascot, drop shadows (own stylesheet, exempt from the
       semantic-variable theming rule).
-- [ ] Task engine: simple goals ("make the button blue", "bigger heading",
+- [x] Task engine: simple goals ("make the button blue", "bigger heading",
       "move the logo left") verified against builder state.
-- [ ] Hostile UX toolkit (each a small composable behavior): nested
+- [x] Hostile UX toolkit (each a small composable behavior): nested
       accordions, settings-gear-inside-settings-gear, confirm modals,
       moving save button, slider-instead-of-number-input, fake loading
       spinners.
-- [ ] Rage meter: fills on misclicks/dead-ends; when full, "REWRITE IT
+- [x] Rage meter: fills on misclicks/dead-ends; when full, "REWRITE IT
       FROM SCRATCH" converts the ticket into a giant typing snippet at
       bonus rates.
-- [ ] Pay 5–10x feature tickets; spawn rate low; always optional on the
+- [x] Pay 5–10x feature tickets; spawn rate low; always optional on the
       board.
 - [ ] Upgrades: 1–2 that ease the pain slightly ("bribe vendor for API
-      access") without removing it.
+      access") without removing it. (Deferred to a balance pass.)
 
 **Acceptance:** the mini-game is genuinely irritating but short (60–120s),
 lucrative, and the rage-rewrite release feels great.
