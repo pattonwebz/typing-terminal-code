@@ -22,8 +22,8 @@ export const TICKET_TYPES = [
     id: 'clientRequest',
     name: 'Client Request',
     moneyPerChar: 4,
-    spawnWeight: 0,
-    enabled: false,
+    spawnWeight: 1,
+    enabled: true,
   },
   {
     id: 'rush',

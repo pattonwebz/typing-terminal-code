@@ -323,6 +323,27 @@ export function useGameState() {
     })
   }
 
+  // Rage-quit WordBuildr: the ticket becomes a big typing job at bonus pay.
+  // Cathartic. (Page Builder Hell, DESIGN.md.)
+  function rewriteTicket() {
+    setState((s) => {
+      const t = s.tickets.active
+      if (!t || t.type !== 'clientRequest') return s
+      return {
+        ...s,
+        tickets: {
+          ...s.tickets,
+          active: {
+            ...t,
+            type: 'feature',
+            payMoney: Math.round(t.payMoney * 1.5),
+            rewrite: true,
+          },
+        },
+      }
+    })
+  }
+
   // Move to the next era once enough tickets are completed in the current
   // one. Board and active ticket are dropped — new era, new backlog.
   // (Full soft-prestige with Experience lands in step 7.)
@@ -383,6 +404,7 @@ export function useGameState() {
     pickTicket,
     abandonTicket,
     completeTicket,
+    rewriteTicket,
     buy,
     reset,
   }

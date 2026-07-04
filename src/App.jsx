@@ -11,6 +11,7 @@ import { getEra, nextEra } from './data/eras.js'
 import { ticketTypeName } from './tickets.js'
 import TypingPane from './TypingPane.jsx'
 import FixItPane from './FixItPane.jsx'
+import WordBuildr from './WordBuildr.jsx'
 import TicketBoard from './TicketBoard.jsx'
 import './App.css'
 
@@ -58,6 +59,7 @@ export default function App() {
     pickTicket,
     abandonTicket,
     completeTicket,
+    rewriteTicket,
     advanceEra,
     buy,
     reset,
@@ -167,7 +169,13 @@ export default function App() {
                   abandon
                 </button>
               </div>
-              {ticket.type === 'bugfix' ? (
+              {ticket.type === 'clientRequest' ? (
+                <WordBuildr
+                  ticket={ticket}
+                  onComplete={onComplete}
+                  onRewrite={rewriteTicket}
+                />
+              ) : ticket.type === 'bugfix' ? (
                 <FixItPane
                   ticket={ticket}
                   stats={stats}

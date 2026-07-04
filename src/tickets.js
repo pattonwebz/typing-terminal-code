@@ -3,6 +3,7 @@ import { CLIENTS, clientsForEra } from './data/clients.js'
 import { TICKET_TYPES, getTicketType } from './data/ticketTypes.js'
 import { randomSnippet } from './snippets.js'
 import { injectBugs } from './bugInjector.js'
+import { GOAL_TEMPLATES } from './data/wordbuildr.js'
 
 function pick(arr) {
   return arr[Math.floor(Math.random() * arr.length)]
@@ -51,6 +52,13 @@ export function createTicket(eraId, totalLoc, excludeCode, options = {}) {
     deadline: null,
     shippedBugs: [],
     ...(fixit && { buggyCode: fixit.buggyCode, bugs: fixit.bugs }),
+    // Page Builder Hell tickets carry 2 rolled goals (serializable form).
+    ...(type.id === 'clientRequest' && {
+      builderGoals: [...GOAL_TEMPLATES]
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 2)
+        .map((g) => ({ id: g.id, target: g.roll() })),
+    }),
   }
 }
 
