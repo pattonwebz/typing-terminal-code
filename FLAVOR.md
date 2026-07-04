@@ -52,6 +52,19 @@ Mechanics live in DESIGN.md; this file is pure tone.
 - Modal copy: "Are you sure? Unsaved changes may or may not be saved."
 - The save button label cycles: Save → Sync → Publish → Push Live → Save.
 
+## Software products
+- Product name seeds per era: "HitCounter Pro" (shareware), "phpGuestbook
+  Deluxe", "jQuery.sparkle", "DeployDeck" (dev tool), "SummarAIze" (AI
+  wrapper).
+- Marketing channels: webring banner exchange → forum signature → "an SEO
+  guy named Trevor" → social ads → AI-generated slop (small chance it
+  backfires and tanks relevance).
+- SaaS crossover moment deserves a celebration effect: "Your SaaS is
+  profitable. Frame this month's invoice."
+- Churn review copy: "Worked great until it didn't. ★★"
+- Retirement eulogy: "HitCounter Pro (1999–2004). It counted. It was
+  enough."
+
 ## Misc / unsorted
 - Achievement idea: "Semicolon Purist" — finish a JS era without a single
   missed `;`.

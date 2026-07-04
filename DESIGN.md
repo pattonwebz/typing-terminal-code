@@ -99,6 +99,50 @@ builder mini-game that suspends typing entirely:
   scratch" — converts the ticket into a giant typing snippet at bonus rates.
 - Upgrades make it slightly less awful, never pleasant.
 
+## Software Products (build & sell your own)
+
+Client tickets are trading time for money; products are the capital arc —
+build something once, sell it forever (if you keep it alive). Unlocks
+mid-career (around the JS era), when the player has spare LoC/Money.
+
+**Building:** starting a product creates a *project* with a LoC budget you
+fill by completing dedicated product tickets (same typing gameplay, no
+client, no Money pay — you're investing). At 100% you launch and pick a
+**business model**, which is permanent per product:
+
+- **One-off** — each sale pays once. Strong immediate income, decays as the
+  market saturates; new *major releases* reset saturation.
+- **Yearly license** — smaller per-sale, but each active customer renews
+  annually *if* the product stayed relevant that year. Lumpy, loyal income.
+- **Monthly SaaS** — subscribers pay continuously **but the product has a
+  running maintenance cost** (servers, support) that at launch *exceeds*
+  revenue. Subscriber growth compounds; the crossover from money-pit to
+  money-printer is the payoff arc. Neglect maintenance and churn spikes.
+
+**Relevance** is the shared decay clock: every product loses relevance over
+time (faster in later eras — the treadmill accelerates). Relevance scales
+sales, renewals, and subscriber growth. You restore it by shipping:
+
+- **Updates** (small product tickets) — cheap relevance top-up.
+- **Fixes** — product bugs spawn from the same bug system as client work
+  (your typos, automation); unfixed product bugs accelerate churn and
+  relevance loss.
+- **Major releases** (big product ticket) — relevance reset + one-off
+  saturation reset + a subscriber/sales spike. Sits on a cooldown.
+
+**Marketing** converts Money into demand: campaigns boost sales/subscriber
+growth for a duration, with diminishing returns per product. Channels are
+era-flavored (webring banners → forum signatures → SEO consultant → social
+ads → AI-generated slop that occasionally backfires). An always-on
+"word of mouth" trickle scales with product quality (low bug count, high
+relevance) so clean engineering is itself marketing.
+
+**Portfolio pressure:** each live product adds tickets to your life
+(updates, fixes, releases). A few well-kept products beat many abandoned
+ones — abandonware keeps selling one-offs briefly, then reviews tank it.
+Products interact with prestige: at ascension, sold/retired products feed
+the Legacy formula ("exits").
+
 ## Prestige
 
 Two layers, matching the career metaphor.
@@ -183,7 +227,9 @@ assets.
 5. Bug lifecycle: shipped bugs, client discovery, tech-debt loop.
 6. Page Builder Hell mini-game (all-new UI, biggest standalone chunk).
 7. Era transitions + Experience prestige + proficiency curves.
-8. AI era endgame: prompt typing, diff review, unmaintainable-code spiral,
+8. Software products: build projects, three business models, relevance
+   decay, releases/updates/fixes, marketing.
+9. AI era endgame: prompt typing, diff review, unmaintainable-code spiral,
    ascension.
 
 ## Current state (v0)
