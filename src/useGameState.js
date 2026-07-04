@@ -5,6 +5,8 @@ import { DEPRECATION_HEADLINES } from './data/news.js'
 import { createTicket, shipRate } from './tickets.js'
 import { getEra, nextEra } from './data/eras.js'
 import { CLIENTS, clientsForEra } from './data/clients.js'
+import { newProduct, tickProduct } from './products.js'
+import { PRODUCT_ECONOMY } from './data/products.js'
 
 const SAVE_KEY = 'typing-terminal-save-v3'
 const OLD_KEYS = ['typing-terminal-save-v1', 'typing-terminal-save-v2']
@@ -50,6 +52,7 @@ function emptyState() {
     // frameworks: { [upgradeId]: { boughtAt, deprecated } }
     frameworks: {},
     news: null,
+    products: [],
     legacy: { banked: 0 },
     offlineEarned: 0,
   }
@@ -84,6 +87,7 @@ function migrate(save) {
     xpOwned: save.xpOwned ?? {},
     frameworks: save.frameworks ?? {},
     news: save.news ?? null,
+    products: save.products ?? [],
     legacy: save.legacy ?? { banked: 0 },
   }
 }
@@ -234,6 +238,41 @@ export function useGameState() {
         }
       })
     }, DISCOVERY_TICK_MS)
+    return () => clearInterval(t)
+  }, [])
+
+  // Product economy tick: relevance decay, sales, SaaS maintenance.
+  useEffect(() => {
+    const t = setInterval(() => {
+      setState((s) => {
+        if (s.products.length === 0) return s
+        let income = 0
+        const products = s.products.map((p) => {
+          const r = tickProduct(p)
+          income += r.income
+          return r.product
+        })
+        // SaaS maintenance can outrun the wallet; money floors at 0 and the
+        // shortfall churns subscribers (you stopped paying the servers).
+        let money = s.currencies.money + income
+        if (money < 0) {
+          const shortfall = -money
+          money = 0
+          products.forEach((p, i) => {
+            if (p.model === 'saas')
+              products[i] = {
+                ...p,
+                subscribers: Math.max(0, p.subscribers - shortfall * 0.05),
+              }
+          })
+        }
+        return {
+          ...s,
+          currencies: { ...s.currencies, money },
+          lifetimeScore: s.lifetimeScore + Math.max(0, income) * 2,
+        }
+      })
+    }, 1000)
     return () => clearInterval(t)
   }, [])
 
@@ -455,6 +494,70 @@ export function useGameState() {
     })
   }
 
+  // ---- Products (spend LoC to build/maintain, earn Money) ----
+
+  function startProduct() {
+    setState((s) => {
+      if (s.currencies.money < PRODUCT_ECONOMY.createCostMoney) return s
+      return {
+        ...s,
+        currencies: {
+          ...s.currencies,
+          money: s.currencies.money - PRODUCT_ECONOMY.createCostMoney,
+        },
+        products: [...s.products, newProduct(s.era)],
+      }
+    })
+  }
+
+  function productAction(productId, action) {
+    setState((s) => {
+      const E = PRODUCT_ECONOMY
+      const i = s.products.findIndex((p) => p.id === productId)
+      if (i < 0) return s
+      const p = s.products[i]
+      let { loc, money } = s.currencies
+      let next = p
+
+      if (action === 'invest' && !p.model) {
+        if (loc < E.investChunk) return s
+        loc -= E.investChunk
+        next = { ...p, invested: p.invested + E.investChunk }
+      } else if (action.startsWith('launch:')) {
+        if (p.model || p.invested < E.buildBudgetLoc) return s
+        next = { ...p, model: action.split(':')[1], relevance: 100 }
+      } else if (action === 'update' && p.model) {
+        if (loc < E.updateCostLoc) return s
+        loc -= E.updateCostLoc
+        next = {
+          ...p,
+          relevance: Math.min(100, p.relevance + E.updateRelevance),
+        }
+      } else if (action === 'release' && p.model) {
+        if (loc < E.releaseCostLoc) return s
+        loc -= E.releaseCostLoc
+        next = { ...p, relevance: 100, saturation: 0 }
+      } else if (action === 'market' && p.model) {
+        if (money < E.marketingCostMoney) return s
+        money -= E.marketingCostMoney
+        next = { ...p, marketingUntil: Date.now() + E.marketingDurationMs }
+      } else if (action === 'retire') {
+        return {
+          ...s,
+          products: s.products.filter((x) => x.id !== productId),
+          // retired products feed the Legacy formula (an "exit")
+          lifetimeScore:
+            s.lifetimeScore + (p.subscribers + p.customers) * 50 + p.invested,
+        }
+      } else {
+        return s
+      }
+      const products = [...s.products]
+      products[i] = next
+      return { ...s, currencies: { loc, money }, products }
+    })
+  }
+
   function reset() {
     localStorage.removeItem(SAVE_KEY)
     for (const key of OLD_KEYS) localStorage.removeItem(key)
@@ -475,6 +578,8 @@ export function useGameState() {
     rewriteTicket,
     buy,
     buyXp,
+    startProduct,
+    productAction,
     reset,
   }
 }

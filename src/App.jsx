@@ -14,6 +14,7 @@ import TypingPane from './TypingPane.jsx'
 import FixItPane from './FixItPane.jsx'
 import WordBuildr from './WordBuildr.jsx'
 import TicketBoard from './TicketBoard.jsx'
+import ProductsPanel from './ProductsPanel.jsx'
 import './App.css'
 
 function fmt(n) {
@@ -66,6 +67,8 @@ export default function App() {
     advanceEra,
     buy,
     buyXp,
+    startProduct,
+    productAction,
     reset,
   } = useGameState()
   // stable identities for TypingPane's keydown effect
@@ -209,6 +212,12 @@ export default function App() {
             slots={stats.boardSlots}
             canPick={!ticket}
             onPick={pickTicket}
+          />
+
+          <ProductsPanel
+            state={state}
+            onStart={startProduct}
+            onAction={productAction}
           />
         </section>
 
