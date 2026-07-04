@@ -5,7 +5,8 @@ import {
   techDebt,
   TECH_DEBT_SOFT_CAP,
 } from './useGameState.js'
-import { UPGRADES, upgradeCost } from './upgrades.js'
+import { upgradeCost, visibleUpgrades } from './upgrades.js'
+import { XP_UPGRADES, xpUpgradeCost } from './data/xpUpgrades.js'
 import { CLIENTS } from './data/clients.js'
 import { getEra, nextEra } from './data/eras.js'
 import { ticketTypeName } from './tickets.js'
@@ -25,7 +26,9 @@ function ShopSection({ title, currency, symbol, state, buy }) {
   return (
     <>
       <h2>{title}</h2>
-      {UPGRADES.filter((u) => u.currency === currency).map((u) => {
+      {visibleUpgrades(state.era)
+        .filter((u) => u.currency === currency)
+        .map((u) => {
         const n = state.owned[u.id] ?? 0
         const cost = upgradeCost(u, n)
         const maxed = n >= u.max
@@ -62,6 +65,7 @@ export default function App() {
     rewriteTicket,
     advanceEra,
     buy,
+    buyXp,
     reset,
   } = useGameState()
   // stable identities for TypingPane's keydown effect
@@ -223,6 +227,32 @@ export default function App() {
             state={state}
             buy={buy}
           />
+          {(state.xp > 0 || Object.keys(state.xpOwned).length > 0) && (
+            <>
+              <h2>Experience ({state.xp} XP)</h2>
+              {XP_UPGRADES.map((u) => {
+                const n = state.xpOwned[u.id] ?? 0
+                const cost = xpUpgradeCost(u, n)
+                const maxed = n >= u.max
+                return (
+                  <button
+                    key={u.id}
+                    className="upgrade"
+                    disabled={maxed || state.xp < cost}
+                    onClick={() => buyXp(u.id)}
+                  >
+                    <span className="upgrade-name">
+                      {u.name} {n > 0 && <em>x{n}</em>}
+                    </span>
+                    <span className="upgrade-desc">{u.desc}</span>
+                    <span className="upgrade-cost">
+                      {maxed ? 'MAXED' : `${cost} XP`}
+                    </span>
+                  </button>
+                )
+              })}
+            </>
+          )}
           <button
             className="reset"
             onClick={() => confirm('Wipe save?') && reset()}
@@ -234,6 +264,7 @@ export default function App() {
 
       <footer>
         <span className="era-tagline">“{era.tagline}”</span>
+        {state.news && <span className="news-ticker">📰 {state.news}</span>}
         {state.era === 'html' && (
           <span className="visitor-counter">
             You are visitor #

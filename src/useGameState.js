@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { UPGRADES, upgradeCost, deriveStats } from './upgrades.js'
+import { XP_UPGRADES, xpUpgradeCost, deriveXpStats } from './data/xpUpgrades.js'
+import { DEPRECATION_HEADLINES } from './data/news.js'
 import { createTicket, shipRate } from './tickets.js'
 import { getEra, nextEra } from './data/eras.js'
 import { CLIENTS, clientsForEra } from './data/clients.js'
@@ -9,6 +11,8 @@ const OLD_KEYS = ['typing-terminal-save-v1', 'typing-terminal-save-v2']
 // Cap offline earnings so a week away doesn't trivialize the economy.
 const MAX_OFFLINE_SECONDS = 4 * 60 * 60
 const TICKET_SPAWN_MS = 8000
+// How long a framework stays fresh before deprecation rolls begin.
+const FRAMEWORK_FRESH_MS = 5 * 60 * 1000
 const DISCOVERY_TICK_MS = 10000
 // Chance per discovery tick that a given dormant bug is found by its client
 // (nitpicky clients look harder).
@@ -40,6 +44,12 @@ function emptyState() {
     reputation: 50,
     // typos made on the current active ticket (candidate shipped bugs)
     activeTypos: 0,
+    // soft-prestige currency granted at era transitions (this career only)
+    xp: 0,
+    xpOwned: {},
+    // frameworks: { [upgradeId]: { boughtAt, deprecated } }
+    frameworks: {},
+    news: null,
     legacy: { banked: 0 },
     offlineEarned: 0,
   }
@@ -70,6 +80,10 @@ function migrate(save) {
     codebase: save.codebase ?? [],
     reputation: save.reputation ?? 50,
     activeTypos: 0,
+    xp: save.xp ?? 0,
+    xpOwned: save.xpOwned ?? {},
+    frameworks: save.frameworks ?? {},
+    news: save.news ?? null,
     legacy: save.legacy ?? { banked: 0 },
   }
 }
@@ -99,8 +113,8 @@ export function techDebt(state) {
   )
 }
 
-function clampRep(r) {
-  return Math.max(0, Math.min(100, r))
+function clampRep(r, floor = 0) {
+  return Math.max(floor, Math.min(100, r))
 }
 
 function initialState() {
@@ -134,9 +148,13 @@ function initialState() {
 
 export function useGameState() {
   const [state, setState] = useState(initialState)
-  const stats = deriveStats(state.owned)
+  const xpStats = deriveXpStats(state.xpOwned)
+  const stats = deriveStats(state.owned, state.frameworks)
+  stats.multiplier *= xpStats.typingMult
   const statsRef = useRef(stats)
   statsRef.current = stats
+  const xpStatsRef = useRef(xpStats)
+  xpStatsRef.current = xpStats
 
   // Passive income tick — and automation quietly shipping bugs.
   useEffect(() => {
@@ -169,17 +187,16 @@ export function useGameState() {
     const t = setInterval(() => {
       setState((s) => {
         if (s.tickets.open.length >= statsRef.current.boardSlots) return s
+        const n =
+          1 + (Math.random() < xpStatsRef.current.spawnSpeed - 1 ? 1 : 0)
+        const spawned = Array.from({ length: n }, () =>
+          createTicket(s.era, s.lifetimeLoc, s.tickets.active?.snippet.code, {
+            reputation: s.reputation,
+          })
+        ).slice(0, statsRef.current.boardSlots - s.tickets.open.length)
         return {
           ...s,
-          tickets: {
-            ...s.tickets,
-            open: [
-              ...s.tickets.open,
-              createTicket(s.era, s.lifetimeLoc, s.tickets.active?.snippet.code, {
-                reputation: s.reputation,
-              }),
-            ],
-          },
+          tickets: { ...s.tickets, open: [...s.tickets.open, ...spawned] },
         }
       })
     }, TICKET_SPAWN_MS)
@@ -202,7 +219,7 @@ export function useGameState() {
         return {
           ...s,
           codebase: s.codebase.filter((b) => b !== found),
-          reputation: clampRep(s.reputation - 2),
+          reputation: clampRep(s.reputation - 2, xpStatsRef.current.repFloor),
           tickets: {
             ...s.tickets,
             open: [
@@ -217,6 +234,32 @@ export function useGameState() {
         }
       })
     }, DISCOVERY_TICK_MS)
+    return () => clearInterval(t)
+  }, [])
+
+  // The ecosystem moves on: owned frameworks eventually deprecate.
+  useEffect(() => {
+    const t = setInterval(() => {
+      setState((s) => {
+        const entry = Object.entries(s.frameworks).find(
+          ([, f]) =>
+            !f.deprecated &&
+            Date.now() - f.boughtAt > FRAMEWORK_FRESH_MS &&
+            Math.random() < 0.25
+        )
+        if (!entry) return s
+        const [id, f] = entry
+        const u = UPGRADES.find((x) => x.id === id)
+        const headline = DEPRECATION_HEADLINES[
+          Math.floor(Math.random() * DEPRECATION_HEADLINES.length)
+        ](u.name.replace('Framework: ', ''))
+        return {
+          ...s,
+          frameworks: { ...s.frameworks, [id]: { ...f, deprecated: true } },
+          news: headline,
+        }
+      })
+    }, 30000)
     return () => clearInterval(t)
   }, [])
 
@@ -270,7 +313,7 @@ export function useGameState() {
   function abandonTicket() {
     setState((s) => ({
       ...s,
-      reputation: clampRep(s.reputation - 1),
+      reputation: clampRep(s.reputation - 1, xpStatsRef.current.repFloor),
       activeTypos: 0,
       tickets: { ...s.tickets, active: null },
     }))
@@ -312,7 +355,7 @@ export function useGameState() {
           [s.era]: (s.proficiency[s.era] ?? 0) + 1,
         },
         codebase: [...s.codebase, ...newBugs],
-        reputation: clampRep(s.reputation + repDelta),
+        reputation: clampRep(s.reputation + repDelta, xpStatsRef.current.repFloor),
         activeTypos: 0,
         tickets: {
           ...s.tickets,
@@ -352,9 +395,13 @@ export function useGameState() {
       const next = nextEra(s.era)
       const need = getEra(s.era).ticketsToAdvance
       if (!next || need == null || (s.proficiency[s.era] ?? 0) < need) return s
+      const eraOrder = getEra(s.era).order
+      const xpGain = Math.round((s.proficiency[s.era] ?? 0) * (eraOrder + 1) * 1.5)
       return {
         ...s,
         era: next.id,
+        xp: s.xp + xpGain,
+        news: `You've learned ${next.name.replace(' Era', '')}. God help you. (+${xpGain} XP)`,
         activeTypos: 0,
         tickets: {
           ...s.tickets,
@@ -383,6 +430,27 @@ export function useGameState() {
           [upgrade.currency]: wallet - cost,
         },
         owned: { ...s.owned, [upgradeId]: n + 1 },
+        frameworks:
+          upgrade.type === 'framework'
+            ? {
+                ...s.frameworks,
+                [upgradeId]: { boughtAt: Date.now(), deprecated: false },
+              }
+            : s.frameworks,
+      }
+    })
+  }
+
+  function buyXp(upgradeId) {
+    const upgrade = XP_UPGRADES.find((u) => u.id === upgradeId)
+    setState((s) => {
+      const n = s.xpOwned[upgradeId] ?? 0
+      const cost = xpUpgradeCost(upgrade, n)
+      if (n >= upgrade.max || s.xp < cost) return s
+      return {
+        ...s,
+        xp: s.xp - cost,
+        xpOwned: { ...s.xpOwned, [upgradeId]: n + 1 },
       }
     })
   }
@@ -406,6 +474,7 @@ export function useGameState() {
     completeTicket,
     rewriteTicket,
     buy,
+    buyXp,
     reset,
   }
 }

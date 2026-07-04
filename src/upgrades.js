@@ -54,6 +54,36 @@ export const UPGRADES = [
     max: 4,
   },
 
+  // Era-specific frameworks (JS era+): huge multiplier while fresh, then the
+  // ecosystem moves on and they deprecate to a shadow of themselves.
+  // Deprecation state lives in game state (frameworks[id].deprecated).
+  {
+    id: 'fw-quandary',
+    name: 'Framework: Quandary.js',
+    desc: 'x3 typing earnings… while it lasts',
+    currency: 'loc',
+    type: 'framework',
+    value: 3,
+    deprecatedValue: 1.25,
+    baseCost: 4000,
+    costGrowth: 1,
+    max: 1,
+    eras: ['js', 'spa', 'ai'],
+  },
+  {
+    id: 'fw-mootlace',
+    name: 'Framework: Mootlace',
+    desc: 'x3 typing earnings… while it lasts',
+    currency: 'loc',
+    type: 'framework',
+    value: 3,
+    deprecatedValue: 1.25,
+    baseCost: 12000,
+    costGrowth: 1,
+    max: 1,
+    eras: ['js', 'spa', 'ai'],
+  },
+
   // Business upgrades (Money)
   {
     id: 'intern',
@@ -96,7 +126,13 @@ export function upgradeCost(upgrade, owned) {
 
 // Derive all effective rates from owned-counts, so game state only needs
 // to persist { upgradeId: count }.
-export function deriveStats(owned) {
+export function visibleUpgrades(eraId) {
+  return UPGRADES.filter((u) => !u.eras || u.eras.includes(eraId))
+}
+
+// frameworks: { [id]: { boughtAt, deprecated } } from game state — needed
+// because a framework's multiplier collapses when it deprecates.
+export function deriveStats(owned, frameworks = {}) {
   const stats = {
     perChar: 1,
     multiplier: 1,
@@ -114,6 +150,10 @@ export function deriveStats(owned) {
     if (u.type === 'passive') stats.passiveRate += u.value * n
     if (u.type === 'comboBoost') stats.comboBoost += u.value * n
     if (u.type === 'boardSlot') stats.boardSlots += u.value * n
+    if (u.type === 'framework')
+      stats.multiplier *= frameworks[u.id]?.deprecated
+        ? u.deprecatedValue
+        : u.value
   }
   return stats
 }

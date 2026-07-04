@@ -727,3 +727,8 @@ footer {
   padding: 0.3rem 0.7rem;
   cursor: pointer;
 }
+
+.news-ticker {
+  color: var(--amber);
+  font-size: 0.78rem;
+}
