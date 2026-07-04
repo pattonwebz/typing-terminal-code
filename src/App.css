@@ -521,3 +521,17 @@ footer {
   background: color-mix(in srgb, var(--red) 25%, transparent);
   border-bottom: 2px solid var(--red);
 }
+
+/* Status row (reputation, tech debt) */
+.status-row {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.8rem;
+  color: var(--dim);
+  margin-bottom: 0.75rem;
+}
+
+.status-row .debt-high {
+  color: var(--red);
+  font-weight: bold;
+}

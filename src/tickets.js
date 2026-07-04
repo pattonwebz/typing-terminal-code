@@ -1,5 +1,5 @@
 import { getEra } from './data/eras.js'
-import { clientsForEra } from './data/clients.js'
+import { CLIENTS, clientsForEra } from './data/clients.js'
 import { TICKET_TYPES, getTicketType } from './data/ticketTypes.js'
 import { randomSnippet } from './snippets.js'
 import { injectBugs } from './bugInjector.js'
@@ -21,13 +21,18 @@ function weightedType() {
 
 // Ticket shape (DESIGN.md / TASKS.md step 1):
 // { id, type, clientId, era, snippet, payMoney, createdAt,
-//   deadline?, shippedBugs[] }
+//   deadline?, shippedBugs[] } (+ buggyCode/bugs on Fix-It tickets)
 // LoC is paid live per keystroke by the typing engine; payMoney on completion.
-export function createTicket(eraId, totalLoc, excludeCode) {
+// options: { type, clientId, reputation } — reputation scales Money pay
+// (0.5x at rep 0 → 1.5x at rep 100).
+export function createTicket(eraId, totalLoc, excludeCode, options = {}) {
   const era = getEra(eraId)
-  const type = weightedType()
-  const client = pick(clientsForEra(eraId))
+  const type = options.type ? getTicketType(options.type) : weightedType()
+  const client = options.clientId
+    ? CLIENTS.find((c) => c.id === options.clientId)
+    : pick(clientsForEra(eraId))
   const snippet = randomSnippet(era.snippetPool, totalLoc, excludeCode)
+  const repMult = 0.5 + (options.reputation ?? 50) / 100
   // Fix-It tickets ship pre-broken: 2–5 bugs depending on snippet size.
   const fixit =
     type.id === 'bugfix'
@@ -40,7 +45,7 @@ export function createTicket(eraId, totalLoc, excludeCode) {
     era: eraId,
     snippet,
     payMoney: Math.round(
-      snippet.code.length * type.moneyPerChar * era.payMultiplier
+      snippet.code.length * type.moneyPerChar * era.payMultiplier * repMult
     ),
     createdAt: Date.now(),
     deadline: null,
@@ -51,4 +56,13 @@ export function createTicket(eraId, totalLoc, excludeCode) {
 
 export function ticketTypeName(ticket) {
   return getTicketType(ticket.type).name
+}
+
+// Current ship-rate for an era given tickets completed there: interpolates
+// the era's proficiency curve (you get better, then the next era resets you).
+export function shipRate(eraId, ticketsDone) {
+  const { startShipRate, minShipRate, ticketsToMaster } =
+    getEra(eraId).proficiency
+  const t = Math.min(1, (ticketsDone ?? 0) / ticketsToMaster)
+  return startShipRate - (startShipRate - minShipRate) * t
 }

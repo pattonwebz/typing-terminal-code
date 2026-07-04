@@ -1,5 +1,10 @@
 import { useCallback, useEffect } from 'react'
-import { useGameState, pendingLegacy } from './useGameState.js'
+import {
+  useGameState,
+  pendingLegacy,
+  techDebt,
+  TECH_DEBT_SOFT_CAP,
+} from './useGameState.js'
 import { UPGRADES, upgradeCost } from './upgrades.js'
 import { CLIENTS } from './data/clients.js'
 import { getEra, nextEra } from './data/eras.js'
@@ -49,6 +54,7 @@ export default function App() {
     state,
     stats,
     earn,
+    noteTypo,
     pickTicket,
     abandonTicket,
     completeTicket,
@@ -59,10 +65,12 @@ export default function App() {
   // stable identities for TypingPane's keydown effect
   const onEarn = useCallback(earn, []) // eslint-disable-line react-hooks/exhaustive-deps
   const onComplete = useCallback(completeTicket, []) // eslint-disable-line react-hooks/exhaustive-deps
+  const onMiss = useCallback(noteTypo, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const ticket = state.tickets.active
   const client = ticket && CLIENTS.find((c) => c.id === ticket.clientId)
   const legacy = pendingLegacy(state)
+  const debt = techDebt(state)
 
   const era = getEra(state.era)
   const next = nextEra(state.era)
@@ -95,6 +103,20 @@ export default function App() {
           )}
         </div>
       </header>
+
+      <div className="status-row">
+        <span title="Reputation: clean work raises it, discovered bugs bleed it. Scales ticket pay.">
+          rep {'★'.repeat(Math.round(state.reputation / 20)) || '☆'}{' '}
+          {Math.round(state.reputation)}/100
+        </span>
+        <span
+          className={debt > TECH_DEBT_SOFT_CAP ? 'debt-high' : undefined}
+          title="Tech debt: dormant + open bugs. Above the cap, typing earnings suffer."
+        >
+          tech debt {debt}/{TECH_DEBT_SOFT_CAP}
+          {debt > TECH_DEBT_SOFT_CAP && ' — earnings −25%'}
+        </span>
+      </div>
 
       {state.offlineEarned > 0 && (
         <div className="offline-banner">
@@ -162,6 +184,7 @@ export default function App() {
                   stats={stats}
                   onEarn={onEarn}
                   onComplete={onComplete}
+                  onMiss={onMiss}
                 />
               )}
             </>

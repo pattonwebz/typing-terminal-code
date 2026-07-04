@@ -6,7 +6,7 @@ const COMPLETION_BONUS_PER_CHAR = 2
 
 // Controlled typing engine: the active ticket supplies the snippet; the
 // parent is told when it's fully typed so it can pay out and rotate tickets.
-export default function TypingPane({ snippet, stats, onEarn, onComplete }) {
+export default function TypingPane({ snippet, stats, onEarn, onComplete, onMiss }) {
   const [pos, setPos] = useState(0)
   const [combo, setCombo] = useState(0)
   const [lastEvent, setLastEvent] = useState(null) // 'crit' | 'miss' | 'done'
@@ -32,6 +32,7 @@ export default function TypingPane({ snippet, stats, onEarn, onComplete }) {
       if (key !== expected) {
         setCombo(0)
         setLastEvent('miss')
+        onMiss?.()
         return
       }
 
@@ -64,7 +65,7 @@ export default function TypingPane({ snippet, stats, onEarn, onComplete }) {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [snippet, pos, stats, tier, comboMult, onEarn, onComplete])
+  }, [snippet, pos, stats, tier, comboMult, onEarn, onComplete, onMiss])
 
   return (
     <div className="typing-pane" ref={paneRef}>
