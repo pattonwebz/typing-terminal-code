@@ -862,3 +862,204 @@ footer {
   cursor: pointer;
   user-select: none;
 }
+
+/* ================= Polish layer =================
+   Depth, rhythm, and motion. Only consumes semantic variables, so every
+   era theme inherits the same upgrades. */
+
+:root {
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.35);
+  --glow: 0 0 12px color-mix(in srgb, var(--green) 35%, transparent);
+}
+
+:root[data-era='html'],
+:root[data-era='php'],
+:root[data-era='js'],
+:root[data-era='ai'] {
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.12);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+body {
+  background:
+    radial-gradient(1200px 500px at 20% -10%, color-mix(in srgb, var(--blue) 7%, transparent), transparent),
+    var(--bg);
+  min-height: 100vh;
+}
+
+button {
+  transition: border-color 0.15s, background 0.15s, color 0.15s,
+    transform 0.1s, box-shadow 0.15s;
+}
+
+/* Header becomes a proper toolbar */
+header {
+  padding-bottom: 0.9rem;
+}
+
+h1 {
+  letter-spacing: 0.02em;
+}
+
+h1::after {
+  content: '▌';
+  margin-left: 0.25rem;
+  animation: caret-blink 1.1s steps(1) infinite;
+}
+
+@keyframes caret-blink {
+  50% { opacity: 0; }
+}
+
+.currency {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.currency .loc,
+.currency .money,
+.currency .legacy {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.2rem 0.65rem;
+  margin-left: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.currency .legacy { font-size: 0.95rem; align-self: center; }
+
+/* Panels get depth */
+.typing-pane,
+.ticket-card,
+.upgrade,
+.product-card,
+.offline-banner,
+.no-ticket {
+  box-shadow: var(--shadow-sm);
+}
+
+.typing-pane {
+  box-shadow: var(--shadow-md);
+  border-top: 2px solid var(--blue);
+}
+
+/* Snippet: roomier, softly carded */
+.snippet {
+  font-size: 1.15rem;
+  line-height: 1.9;
+  background: color-mix(in srgb, var(--bg) 55%, var(--panel));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+}
+
+.cursor {
+  animation: caret-pulse 1s ease-in-out infinite;
+  box-shadow: var(--glow);
+}
+
+@keyframes caret-pulse {
+  50% { filter: brightness(1.35); }
+}
+
+.typed { text-shadow: 0 0 8px color-mix(in srgb, var(--green) 30%, transparent); }
+
+/* Meta badges read as pills */
+.typing-meta .tier,
+.ticket-type {
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 0.05rem 0.55rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Ticket cards: type-tinted edge + lift on hover */
+.ticket-card { border-left: 3px solid var(--border); }
+.ticket-card:hover:not(:disabled):not(.ticket-empty) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-left-color: var(--blue);
+}
+
+/* Shop: section rules + hover nudge */
+.shop h2,
+.board h2,
+.products h2 {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.35rem;
+}
+
+.upgrade { position: relative; }
+.upgrade:hover:not(:disabled) {
+  transform: translateX(2px);
+  box-shadow: var(--shadow-md);
+}
+.upgrade-cost { font-weight: bold; }
+
+/* Bars: gradient fills */
+.era-progress-fill,
+.product-bar-fill {
+  background: linear-gradient(90deg, var(--blue), var(--green));
+}
+
+.era-progress-bar,
+.product-bar { border-radius: 999px; }
+
+/* Status row chips */
+.status-row > span,
+.status-row > label {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.status-row { gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+
+/* Footer quieter */
+footer { font-style: italic; }
+.era-tagline { opacity: 0.85; }
+
+/* Floating numbers pop harder */
+.fx-float {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  font-size: 1.05rem;
+}
+
+/* HTML era keeps its kitsch: beveled “98” buttons */
+:root[data-era='html'] .upgrade,
+:root[data-era='html'] .ticket-card,
+:root[data-era='html'] .era-advance,
+:root[data-era='html'] .product-new {
+  border: 2px outset #fff;
+  box-shadow: none;
+}
+
+:root[data-era='html'] .upgrade:active,
+:root[data-era='html'] .ticket-card:active {
+  border-style: inset;
+}
+
+:root[data-era='html'] body,
+:root[data-era='html'] .app { image-rendering: pixelated; }
+
+/* AI era: extra roundness and a faint gradient wash */
+:root[data-era='ai'] .typing-pane {
+  border-top: 2px solid transparent;
+  border-image: linear-gradient(90deg, #7c3aed, #db2777) 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  h1::after, .cursor { animation: none; }
+  .ticket-card:hover:not(:disabled):not(.ticket-empty),
+  .upgrade:hover:not(:disabled) { transform: none; }
+}
