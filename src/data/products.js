@@ -46,7 +46,8 @@ export const BUSINESS_MODELS = [
 export const PRODUCT_ECONOMY = {
   createCostMoney: 800,
   buildBudgetLoc: 3000, // LoC to invest before launch
-  investChunk: 500, // LoC per invest click
+  investChunk: 500, // LoC per invest click (queued, then built over time)
+  devSpeed: 30, // queued LoC applied to the build per second
   relevanceDecayPerEraOrder: 0.02, // % points/s, scaled by (eraOrder+1)
   updateCostLoc: 800, // +25 relevance
   updateRelevance: 25,
@@ -55,11 +56,28 @@ export const PRODUCT_ECONOMY = {
   marketingDurationMs: 90000,
   marketingBoost: 3,
   oneoff: { pricePerAppeal: 40, salesRate: 0.05, saturationPerSale: 0.004 },
-  yearly: { pricePerAppeal: 3, customerGrowth: 0.03 },
+  yearly: { pricePerAppeal: 3, customerGrowth: 0.03, launchCustomers: 2 },
   saas: {
     feePerAppeal: 0.9,
-    subscriberGrowth: 0.004,
+    // flat trickle of new signups plus compounding word-of-mouth
+    signupRate: 0.03,
+    wordOfMouth: 0.002,
+    launchSubscribers: 3, // beta users who followed the dev log
     baseMaintenance: 4,
     maintenancePerSub: 0.06,
+    // random operational disasters (SaaS only)
+    incidentChancePerSec: 0.004, // ~1 every 4 minutes
+    incidentCostBase: 80,
+    incidentCostPerSub: 1.5,
   },
 }
+
+// Ops incidents: the SaaS tax. Cost is base + per-subscriber.
+export const SAAS_INCIDENTS = [
+  'Server fell over at 3am',
+  'SSL cert expired (again)',
+  'A subscriber found the admin panel',
+  'Database backup was the same disk',
+  'Region outage: us-east-1, obviously',
+  'Support ticket escalated to Twitter',
+]

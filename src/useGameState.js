@@ -597,10 +597,19 @@ export function useGameState() {
       if (action === 'invest' && !p.model) {
         if (loc < E.investChunk) return s
         loc -= E.investChunk
-        next = { ...p, invested: p.invested + E.investChunk }
+        // paid now, built over time (devSpeed LoC/s)
+        next = { ...p, queued: (p.queued ?? 0) + E.investChunk }
       } else if (action.startsWith('launch:')) {
         if (p.model || p.invested < E.buildBudgetLoc) return s
-        next = { ...p, model: action.split(':')[1], relevance: 100 }
+        const model = action.split(':')[1]
+        next = {
+          ...p,
+          model,
+          relevance: 100,
+          // launch day brings the first believers
+          subscribers: model === 'saas' ? E.saas.launchSubscribers : 0,
+          customers: model === 'yearly' ? E.yearly.launchCustomers : 0,
+        }
       } else if (action === 'update' && p.model) {
         if (loc < E.updateCostLoc) return s
         loc -= E.updateCostLoc
