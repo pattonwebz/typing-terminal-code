@@ -1,122 +1,72 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useCallback } from 'react'
+import { useGameState } from './useGameState.js'
+import { UPGRADES, upgradeCost } from './upgrades.js'
+import TypingPane from './TypingPane.jsx'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+function fmt(n) {
+  if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M'
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'k'
+  return Math.floor(n).toString()
 }
 
-export default App
+export default function App() {
+  const { state, stats, earn, buy, reset } = useGameState()
+  // earn is stable across renders in practice, but memoize for TypingPane's effect
+  const onEarn = useCallback(earn, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  return (
+    <div className="app">
+      <header>
+        <h1>~/typing-terminal</h1>
+        <div className="currency">
+          <span className="loc">{fmt(state.loc)} LoC</span>
+          {stats.passiveRate > 0 && (
+            <span className="rate">+{stats.passiveRate}/s</span>
+          )}
+        </div>
+      </header>
+
+      {state.offlineEarned > 0 && (
+        <div className="offline-banner">
+          Your interns wrote {fmt(state.offlineEarned)} LoC while you were away.
+        </div>
+      )}
+
+      <main>
+        <TypingPane stats={stats} totalLoc={state.totalLoc} onEarn={onEarn} />
+
+        <aside className="shop">
+          <h2>Upgrades</h2>
+          {UPGRADES.map((u) => {
+            const n = state.owned[u.id] ?? 0
+            const cost = upgradeCost(u, n)
+            const maxed = n >= u.max
+            return (
+              <button
+                key={u.id}
+                className="upgrade"
+                disabled={maxed || state.loc < cost}
+                onClick={() => buy(u.id)}
+              >
+                <span className="upgrade-name">
+                  {u.name} {n > 0 && <em>x{n}</em>}
+                </span>
+                <span className="upgrade-desc">{u.desc}</span>
+                <span className="upgrade-cost">
+                  {maxed ? 'MAXED' : `${fmt(cost)} LoC`}
+                </span>
+              </button>
+            )
+          })}
+          <button
+            className="reset"
+            onClick={() => confirm('Wipe save?') && reset()}
+          >
+            hard reset
+          </button>
+        </aside>
+      </main>
+    </div>
+  )
+}

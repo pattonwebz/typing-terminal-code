@@ -1,0 +1,81 @@
+import { useEffect, useRef, useState } from 'react'
+import { TIERS, randomSnippet } from './snippets.js'
+
+const COMPLETION_BONUS_PER_CHAR = 2
+
+export default function TypingPane({ stats, totalLoc, onEarn }) {
+  const [snippet, setSnippet] = useState(() => randomSnippet(totalLoc))
+  const [pos, setPos] = useState(0)
+  const [combo, setCombo] = useState(0)
+  const [lastEvent, setLastEvent] = useState(null) // 'crit' | 'miss' | 'done'
+  const ref = useRef(null)
+
+  const tier = TIERS[snippet.tier]
+  const comboMult = 1 + (combo / 50) * stats.comboBoost
+
+  useEffect(() => {
+    function onKey(e) {
+      if (e.metaKey || e.ctrlKey || e.altKey) return
+      const expected = snippet.code[pos]
+      let key = e.key
+      if (key === 'Enter') key = '\n'
+      if (key.length !== 1 && key !== '\n') return
+      e.preventDefault()
+
+      if (key !== expected) {
+        setCombo(0)
+        setLastEvent('miss')
+        return
+      }
+
+      const crit = Math.random() < stats.critChance
+      const amount =
+        stats.perChar *
+        stats.multiplier *
+        tier.multiplier *
+        comboMult *
+        (crit ? 10 : 1)
+      onEarn(Math.round(amount * 10) / 10)
+      setCombo((c) => c + 1)
+      setLastEvent(crit ? 'crit' : null)
+
+      if (pos + 1 >= snippet.code.length) {
+        const bonus = Math.round(
+          snippet.code.length *
+            COMPLETION_BONUS_PER_CHAR *
+            stats.multiplier *
+            tier.multiplier
+        )
+        onEarn(bonus)
+        setLastEvent('done')
+        setSnippet(randomSnippet(totalLoc, snippet.code))
+        setPos(0)
+      } else {
+        setPos(pos + 1)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [snippet, pos, stats, tier, comboMult, totalLoc, onEarn])
+
+  return (
+    <div className="typing-pane" ref={ref}>
+      <div className="typing-meta">
+        <span className={`tier tier-${snippet.tier}`}>{tier.name}</span>
+        <span className={`combo ${lastEvent === 'miss' ? 'combo-broken' : ''}`}>
+          combo x{comboMult.toFixed(2)} ({combo})
+        </span>
+        {lastEvent === 'crit' && <span className="crit">CRIT! 10x</span>}
+        {lastEvent === 'done' && <span className="done">snippet bonus!</span>}
+      </div>
+      <pre className="snippet">
+        <span className="typed">{snippet.code.slice(0, pos)}</span>
+        <span className={`cursor ${lastEvent === 'miss' ? 'miss' : ''}`}>
+          {snippet.code[pos] === '\n' ? '⏎\n' : snippet.code[pos]}
+        </span>
+        <span className="untyped">{snippet.code.slice(pos + 1)}</span>
+      </pre>
+      <p className="hint">Just start typing the code above.</p>
+    </div>
+  )
+}
