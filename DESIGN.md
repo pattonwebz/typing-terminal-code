@@ -99,6 +99,38 @@ builder mini-game that suspends typing entirely:
   scratch" — converts the ticket into a giant typing snippet at bonus rates.
 - Upgrades make it slightly less awful, never pleasant.
 
+## Prestige
+
+Two layers, matching the career metaphor.
+
+**Layer 1 — Era transitions (soft, within a career).** Advancing an era
+resets era-specific upgrades and proficiency, keeps money and clients, and
+grants **Experience** (permanent multipliers for the rest of this career).
+Frequent, low-stakes, forward-only.
+
+**Layer 2 — Ascension (hard, ends a career).** At the end of the AI era the
+AI can ship without you: keep grinding a fading career, or cash out — sell
+the agency, burn out, rediscover `<table>` layouts. Everything resets to the
+HTML era except **Legacy**.
+
+- Legacy is awarded at ascension from lifetime stats: total LoC, peak
+  reputation, bugs fixed, page-builder tickets survived. Later careers earn
+  it faster.
+- Legacy buys a permanent perk tree — what a veteran actually keeps:
+  - **Muscle Memory** — start each era with partial proficiency.
+  - **Industry Contacts** — better clients and ticket quality from day one.
+  - **Dotfiles** — begin a career with some skill upgrades pre-owned.
+  - **"I've Seen This Before"** — fix-it bugs highlighted a tier earlier.
+  - **Battle Scars** — rage meter fills faster in Page Builder Hell
+    (less patience as a reward).
+  - **Reputation Precedes You** — permanent reputation floor.
+- Careers accelerate: the first takes days; a full-perk veteran speedruns
+  HTML→AI in an hour chasing meta-goals (achievements, career variants like
+  a no-automation run).
+- Flavor: each ascension shifts the era stacks slightly (PHP era becomes
+  Rails-flavored, jQuery becomes Angular…) — the treadmill never ends, only
+  your scars accumulate.
+
 ## Currencies & meters
 
 | Currency | Earned by | Spent on |
@@ -107,7 +139,8 @@ builder mini-game that suspends typing entirely:
 | Money ($) | completing tickets | business upgrades (hires, tools, office) |
 | Reputation | clean, prompt work | gates better tickets (not spent) |
 | Tech Debt | passive income (anti-currency) | reduced via fix-it work |
-| Experience | era transitions (prestige) | permanent multipliers |
+| Experience | era transitions (soft prestige) | permanent multipliers (this career) |
+| Legacy | ascension (hard prestige) | permanent perk tree (all careers) |
 
 ## Build order
 
