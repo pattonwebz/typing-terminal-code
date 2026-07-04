@@ -5,6 +5,7 @@ import { CLIENTS } from './data/clients.js'
 import { getEra, nextEra } from './data/eras.js'
 import { ticketTypeName } from './tickets.js'
 import TypingPane from './TypingPane.jsx'
+import FixItPane from './FixItPane.jsx'
 import TicketBoard from './TicketBoard.jsx'
 import './App.css'
 
@@ -144,12 +145,25 @@ export default function App() {
                   abandon
                 </button>
               </div>
-              <TypingPane
-                snippet={ticket.snippet}
-                stats={stats}
-                onEarn={onEarn}
-                onComplete={onComplete}
-              />
+              {ticket.type === 'bugfix' ? (
+                <FixItPane
+                  ticket={ticket}
+                  stats={stats}
+                  // Half-mastered era: you can spot your classic mistakes.
+                  highlightBugs={
+                    eraDone >= era.proficiency.ticketsToMaster / 2
+                  }
+                  onEarn={onEarn}
+                  onComplete={onComplete}
+                />
+              ) : (
+                <TypingPane
+                  snippet={ticket.snippet}
+                  stats={stats}
+                  onEarn={onEarn}
+                  onComplete={onComplete}
+                />
+              )}
             </>
           ) : (
             <div className="no-ticket">Pick a ticket from the board to start typing.</div>

@@ -15,8 +15,8 @@ export const TICKET_TYPES = [
     id: 'bugfix',
     name: 'Bug Fix',
     moneyPerChar: 1.5,
-    spawnWeight: 0,
-    enabled: false,
+    spawnWeight: 3,
+    enabled: true,
   },
   {
     id: 'clientRequest',

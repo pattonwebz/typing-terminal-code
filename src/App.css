@@ -511,3 +511,13 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   .fx-float, .era-advance { animation: none; }
 }
+
+/* Fix-It pane */
+.fixit-pane .snippet span {
+  cursor: pointer;
+}
+
+.bug-hint {
+  background: color-mix(in srgb, var(--red) 25%, transparent);
+  border-bottom: 2px solid var(--red);
+}

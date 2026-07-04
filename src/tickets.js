@@ -2,6 +2,7 @@ import { getEra } from './data/eras.js'
 import { clientsForEra } from './data/clients.js'
 import { TICKET_TYPES, getTicketType } from './data/ticketTypes.js'
 import { randomSnippet } from './snippets.js'
+import { injectBugs } from './bugInjector.js'
 
 function pick(arr) {
   return arr[Math.floor(Math.random() * arr.length)]
@@ -27,6 +28,11 @@ export function createTicket(eraId, totalLoc, excludeCode) {
   const type = weightedType()
   const client = pick(clientsForEra(eraId))
   const snippet = randomSnippet(era.snippetPool, totalLoc, excludeCode)
+  // Fix-It tickets ship pre-broken: 2–5 bugs depending on snippet size.
+  const fixit =
+    type.id === 'bugfix'
+      ? injectBugs(snippet.code, Math.min(5, 2 + Math.floor(snippet.code.length / 60)))
+      : null
   return {
     id: `t-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
     type: type.id,
@@ -39,6 +45,7 @@ export function createTicket(eraId, totalLoc, excludeCode) {
     createdAt: Date.now(),
     deadline: null,
     shippedBugs: [],
+    ...(fixit && { buggyCode: fixit.buggyCode, bugs: fixit.bugs }),
   }
 }
 
