@@ -211,20 +211,19 @@ client demands, rage-rewrite text. This step is mostly flavor by design.
 
 **Tasks:**
 
-- [ ] JS-era and SPA-era snippet banks (~15 each) and era-specific
-      upgrades (frameworks with deprecation decay for JS era; automation
-      tier for SPA era).
-- [ ] Era transition flow: confirmation screen (what resets, what stays,
+- [x] JS-era and SPA-era snippet banks (JS bank still small — grow in a
+      content pass) and era-specific framework upgrades with deprecation.
+- [x] Era transition flow: confirmation screen (what resets, what stays,
       Experience granted), reset of era-specific upgrades + proficiency,
       Experience formula from era performance.
-- [ ] Experience spend: small permanent-multiplier upgrades usable this
+- [x] Experience spend: small permanent-multiplier upgrades usable this
       career.
-- [ ] Framework deprecation mechanic: JS-era framework upgrades decay on a
+- [x] Framework deprecation mechanic: JS-era framework upgrades decay on a
       timer with news-ticker announcements.
-- [ ] JS-era theme (early-2010s flat design, rounded corners arrive) and
+- [x] JS-era theme (early-2010s flat design, rounded corners arrive) and
       SPA-era theme (modern dark IDE — roughly the v0 look).
 - [ ] Balance pass: staying in an old era plateaus; advancing is messy
-      (proficiency reset → more bugs) but higher ceiling.
+      (proficiency reset → more bugs) but higher ceiling. (Needs playtest.)
 
 **Acceptance:** a career can progress HTML→SPA with meaningful transition
 decisions; Experience visibly compounds.
