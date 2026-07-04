@@ -328,6 +328,7 @@ export function useGameState() {
         }
         return {
           ...s,
+          products,
           currencies: { ...s.currencies, money },
           lifetimeScore: s.lifetimeScore + Math.max(0, income) * 2,
         }
