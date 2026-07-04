@@ -48,6 +48,13 @@ h1 {
   font-weight: bold;
 }
 
+.currency .money {
+  margin-left: 0.8rem;
+  font-size: 1.4rem;
+  color: var(--green);
+  font-weight: bold;
+}
+
 .currency .rate {
   margin-left: 0.6rem;
   color: var(--dim);
@@ -72,6 +79,32 @@ main {
   main {
     grid-template-columns: 1fr;
   }
+}
+
+/* Active ticket header */
+.ticket-header {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.ticket-type {
+  color: var(--blue);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.05rem 0.4rem;
+}
+
+.ticket-client {
+  color: var(--text);
+  font-weight: bold;
+}
+
+.ticket-pay {
+  color: var(--green);
+  margin-left: auto;
 }
 
 /* Typing pane */

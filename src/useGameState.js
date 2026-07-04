@@ -1,23 +1,52 @@
 import { useEffect, useRef, useState } from 'react'
 import { UPGRADES, upgradeCost, deriveStats } from './upgrades.js'
+import { createTicket } from './tickets.js'
 
-const SAVE_KEY = 'typing-terminal-save-v1'
+const SAVE_KEY = 'typing-terminal-save-v2'
+const V1_KEY = 'typing-terminal-save-v1'
 // Cap offline earnings so a week away doesn't trivialize the economy.
 const MAX_OFFLINE_SECONDS = 4 * 60 * 60
+// Starting era is 'spa' until era snippet banks land (step 3), so gameplay
+// matches v0's modern-JS snippet bank.
+const STARTING_ERA = 'spa'
+
+function emptyState() {
+  return {
+    currencies: { loc: 0, money: 0 },
+    lifetimeLoc: 0,
+    era: STARTING_ERA,
+    // ticket completions per era; drives the bug-rate curve from step 5
+    proficiency: {},
+    owned: {},
+    tickets: { open: [], active: null, completedCount: 0 },
+    offlineEarned: 0,
+  }
+}
+
+function migrateV1(v1) {
+  return {
+    ...emptyState(),
+    currencies: { loc: v1.loc ?? 0, money: 0 },
+    lifetimeLoc: v1.totalLoc ?? 0,
+    owned: v1.owned ?? {},
+    savedAt: v1.savedAt,
+  }
+}
 
 function loadSave() {
   try {
     const raw = localStorage.getItem(SAVE_KEY)
-    if (!raw) return null
-    return JSON.parse(raw)
+    if (raw) return JSON.parse(raw)
+    const v1 = localStorage.getItem(V1_KEY)
+    if (v1) return migrateV1(JSON.parse(v1))
+    return null
   } catch {
     return null
   }
 }
 
 function initialState() {
-  const save = loadSave()
-  const base = save ?? { loc: 0, totalLoc: 0, owned: {}, savedAt: Date.now() }
+  const base = loadSave() ?? emptyState()
   // Grant offline passive income for time elapsed since last save.
   const stats = deriveStats(base.owned)
   const away = Math.min(
@@ -25,12 +54,23 @@ function initialState() {
     MAX_OFFLINE_SECONDS
   )
   const offlineEarned = Math.floor(away * stats.passiveRate)
-  return {
-    loc: base.loc + offlineEarned,
-    totalLoc: base.totalLoc + offlineEarned,
-    owned: base.owned,
+  const state = {
+    ...emptyState(),
+    ...base,
+    currencies: {
+      ...base.currencies,
+      loc: base.currencies.loc + offlineEarned,
+    },
+    lifetimeLoc: base.lifetimeLoc + offlineEarned,
     offlineEarned,
   }
+  if (!state.tickets.active) {
+    state.tickets = {
+      ...state.tickets,
+      active: createTicket(state.era, state.lifetimeLoc),
+    }
+  }
+  return state
 }
 
 export function useGameState() {
@@ -50,23 +90,41 @@ export function useGameState() {
 
   // Autosave on change (and stamp savedAt for offline progress).
   useEffect(() => {
+    const { offlineEarned, ...save } = state
     localStorage.setItem(
       SAVE_KEY,
-      JSON.stringify({
-        loc: state.loc,
-        totalLoc: state.totalLoc,
-        owned: state.owned,
-        savedAt: Date.now(),
-      })
+      JSON.stringify({ ...save, savedAt: Date.now() })
     )
   }, [state])
 
   function earn(amount) {
     setState((s) => ({
       ...s,
-      loc: s.loc + amount,
-      totalLoc: s.totalLoc + amount,
+      currencies: { ...s.currencies, loc: s.currencies.loc + amount },
+      lifetimeLoc: s.lifetimeLoc + amount,
     }))
+  }
+
+  // Called when the active ticket's snippet is fully typed: pays Money,
+  // bumps era proficiency, and pulls up the next ticket.
+  function completeTicket() {
+    setState((s) => {
+      const done = s.tickets.active
+      if (!done) return s
+      return {
+        ...s,
+        currencies: { ...s.currencies, money: s.currencies.money + done.payMoney },
+        proficiency: {
+          ...s.proficiency,
+          [s.era]: (s.proficiency[s.era] ?? 0) + 1,
+        },
+        tickets: {
+          ...s.tickets,
+          active: createTicket(s.era, s.lifetimeLoc, done.snippet.code),
+          completedCount: s.tickets.completedCount + 1,
+        },
+      }
+    })
   }
 
   function buy(upgradeId) {
@@ -74,10 +132,10 @@ export function useGameState() {
     setState((s) => {
       const n = s.owned[upgradeId] ?? 0
       const cost = upgradeCost(upgrade, n)
-      if (n >= upgrade.max || s.loc < cost) return s
+      if (n >= upgrade.max || s.currencies.loc < cost) return s
       return {
         ...s,
-        loc: s.loc - cost,
+        currencies: { ...s.currencies, loc: s.currencies.loc - cost },
         owned: { ...s.owned, [upgradeId]: n + 1 },
       }
     })
@@ -85,8 +143,11 @@ export function useGameState() {
 
   function reset() {
     localStorage.removeItem(SAVE_KEY)
-    setState({ loc: 0, totalLoc: 0, owned: {}, offlineEarned: 0 })
+    localStorage.removeItem(V1_KEY)
+    const fresh = emptyState()
+    fresh.tickets.active = createTicket(fresh.era, 0)
+    setState(fresh)
   }
 
-  return { state, stats, earn, buy, reset }
+  return { state, stats, earn, completeTicket, buy, reset }
 }

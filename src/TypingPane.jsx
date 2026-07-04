@@ -1,17 +1,22 @@
-import { useEffect, useRef, useState } from 'react'
-import { TIERS, randomSnippet } from './snippets.js'
+import { useEffect, useState } from 'react'
+import { TIERS } from './snippets.js'
 
 const COMPLETION_BONUS_PER_CHAR = 2
 
-export default function TypingPane({ stats, totalLoc, onEarn }) {
-  const [snippet, setSnippet] = useState(() => randomSnippet(totalLoc))
+// Controlled typing engine: the active ticket supplies the snippet; the
+// parent is told when it's fully typed so it can pay out and rotate tickets.
+export default function TypingPane({ snippet, stats, onEarn, onComplete }) {
   const [pos, setPos] = useState(0)
   const [combo, setCombo] = useState(0)
   const [lastEvent, setLastEvent] = useState(null) // 'crit' | 'miss' | 'done'
-  const ref = useRef(null)
 
   const tier = TIERS[snippet.tier]
   const comboMult = 1 + (combo / 50) * stats.comboBoost
+
+  // New snippet (next ticket) — restart progress.
+  useEffect(() => {
+    setPos(0)
+  }, [snippet])
 
   useEffect(() => {
     function onKey(e) {
@@ -48,25 +53,24 @@ export default function TypingPane({ stats, totalLoc, onEarn }) {
         )
         onEarn(bonus)
         setLastEvent('done')
-        setSnippet(randomSnippet(totalLoc, snippet.code))
-        setPos(0)
+        onComplete()
       } else {
         setPos(pos + 1)
       }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [snippet, pos, stats, tier, comboMult, totalLoc, onEarn])
+  }, [snippet, pos, stats, tier, comboMult, onEarn, onComplete])
 
   return (
-    <div className="typing-pane" ref={ref}>
+    <div className="typing-pane">
       <div className="typing-meta">
         <span className={`tier tier-${snippet.tier}`}>{tier.name}</span>
         <span className={`combo ${lastEvent === 'miss' ? 'combo-broken' : ''}`}>
           combo x{comboMult.toFixed(2)} ({combo})
         </span>
         {lastEvent === 'crit' && <span className="crit">CRIT! 10x</span>}
-        {lastEvent === 'done' && <span className="done">snippet bonus!</span>}
+        {lastEvent === 'done' && <span className="done">ticket shipped!</span>}
       </div>
       <pre className="snippet">
         <span className="typed">{snippet.code.slice(0, pos)}</span>

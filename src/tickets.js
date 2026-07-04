@@ -3,8 +3,6 @@ import { clientsForEra } from './data/clients.js'
 import { TICKET_TYPES, getTicketType } from './data/ticketTypes.js'
 import { randomSnippet } from './snippets.js'
 
-let nextId = 1
-
 function pick(arr) {
   return arr[Math.floor(Math.random() * arr.length)]
 }
@@ -30,7 +28,7 @@ export function createTicket(eraId, totalLoc, excludeCode) {
   const client = pick(clientsForEra(eraId))
   const snippet = randomSnippet(totalLoc, excludeCode)
   return {
-    id: nextId++,
+    id: `t-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
     type: type.id,
     clientId: client.id,
     era: eraId,
