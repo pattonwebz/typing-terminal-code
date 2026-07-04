@@ -152,14 +152,24 @@ resets era-specific upgrades and proficiency, keeps money and clients, and
 grants **Experience** (permanent multipliers for the rest of this career).
 Frequent, low-stakes, forward-only.
 
-**Layer 2 — Ascension (hard, ends a career).** At the end of the AI era the
-AI can ship without you: keep grinding a fading career, or cash out — sell
-the agency, burn out, rediscover `<table>` layouts. Everything resets to the
-HTML era except **Legacy**.
+**Layer 2 — Ascension (hard, ends a career, available from the start).**
+Legacy accrues *continuously* from your very first keystroke — every action
+(LoC typed, tickets shipped, bugs fixed, reputation gained, page-builder
+tickets survived, product exits) adds to a **pending Legacy** counter,
+visible from early game. Ascending at any time banks the pending amount
+into your cumulative Legacy total and resets the career to the HTML era.
 
-- Legacy is awarded at ascension from lifetime stats: total LoC, peak
-  reputation, bugs fixed, page-builder tickets survived. Later careers earn
-  it faster.
+- **No era gate:** you can ascend long before the AI era. Early careers
+  bank small amounts; deeper runs accrue faster (later eras and products
+  have much higher Legacy yield), so "push further vs. cash out now" is a
+  real decision from the first hour.
+- **Cumulative:** Legacy is never spent down by ascending — banked Legacy
+  only grows across careers. Perk purchases spend from the banked pool.
+- **Sublinear accrual** (e.g. Legacy ∝ √lifetime-value) so repeated
+  shallow resets don't beat one deep run, but a well-timed early prestige
+  still feels great.
+- Reaching the AI-era ascension ending is a *bonus multiplier* on that
+  career's pending Legacy, not the unlock for prestiging.
 - Legacy buys a permanent perk tree — what a veteran actually keeps:
   - **Muscle Memory** — start each era with partial proficiency.
   - **Industry Contacts** — better clients and ticket quality from day one.
@@ -184,7 +194,7 @@ HTML era except **Legacy**.
 | Reputation | clean, prompt work | gates better tickets (not spent) |
 | Tech Debt | passive income (anti-currency) | reduced via fix-it work |
 | Experience | era transitions (soft prestige) | permanent multipliers (this career) |
-| Legacy | ascension (hard prestige) | permanent perk tree (all careers) |
+| Legacy | accrues from all play; banked on ascension (cumulative) | permanent perk tree (all careers) |
 
 ## Visuals & assets: "your screen is the game"
 

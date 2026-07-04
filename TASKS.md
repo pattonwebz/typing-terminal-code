@@ -293,11 +293,18 @@ eulogies.
       Debt.
 - [ ] Failure spiral tuning: unmanaged AI output should snowball; endgame
       upgrades (tests, standards, "actually read the diff") counter it.
-- [ ] Ascension: end-of-career screen, Legacy formula from lifetime stats
-      (total LoC, peak reputation, bugs fixed, page-builder tickets
-      survived), full reset to HTML era.
-- [ ] Legacy perk tree: Muscle Memory, Industry Contacts, Dotfiles, "I've
-      Seen This Before", Battle Scars, Reputation Precedes You.
+- [ ] Pending-Legacy accrual (belongs early, not just this step): every
+      scoring action adds to a visible pending-Legacy counter from the
+      start of the game; sublinear formula (∝ √lifetime value) with
+      per-source weights (LoC, tickets, bugs fixed, reputation, products).
+- [ ] Ascend-anytime flow: available from the first career, banks pending
+      Legacy into the cumulative pool (never spent down by ascending) and
+      resets to the HTML era. Confirmation screen shows pending vs. banked.
+- [ ] AI-era ending as bonus: completing the AI era multiplies that
+      career's pending Legacy rather than gating ascension.
+- [ ] Legacy perk tree (spends from the banked pool): Muscle Memory,
+      Industry Contacts, Dotfiles, "I've Seen This Before", Battle Scars,
+      Reputation Precedes You.
 - [ ] AI-era theme: chat-product minimalism, purple gradients, sparkle
       icons — slightly too clean on purpose.
 - [ ] Ascension reskin: era tech-stack names shift each career (PHP→Rails
