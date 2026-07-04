@@ -283,34 +283,32 @@ eulogies.
 
 **Tasks:**
 
-- [ ] Prompt-typing mode: you type prompts (English), the AI "types" the
+- [x] Prompt-typing mode: you type prompts (English), the AI "types" the
       resulting code at superhuman speed into the codebase.
-- [ ] Diff review mode: AI output arrives as hunks; accept/reject each.
+- [x] Diff review mode: AI output arrives as hunks; accept/reject each.
       Hunk correctness is hidden; your per-era proficiency from this
       career determines how clearly bad hunks are telegraphed.
-- [ ] Unmaintainable-code meter: bad accepted hunks raise it; it
+- [x] Unmaintainable-code meter: bad accepted hunks raise it; it
       multiplies future bug-fix cost/frequency; distinct UI from Tech
       Debt.
-- [ ] Failure spiral tuning: unmanaged AI output should snowball; endgame
-      upgrades (tests, standards, "actually read the diff") counter it.
-- [ ] Pending-Legacy accrual (belongs early, not just this step): every
+- [ ] Failure spiral tuning + endgame counter-upgrades — needs playtest.
+- [x] Pending-Legacy accrual (belongs early, not just this step): every
       scoring action adds to a visible pending-Legacy counter from the
       start of the game; sublinear formula (∝ √lifetime value) with
       per-source weights (LoC, tickets, bugs fixed, reputation, products).
-- [ ] Ascend-anytime flow: available from the first career, banks pending
+- [x] Ascend-anytime flow: available from the first career, banks pending
       Legacy into the cumulative pool (never spent down by ascending) and
       resets to the HTML era. Confirmation screen shows pending vs. banked.
-- [ ] AI-era ending as bonus: completing the AI era multiplies that
+- [x] AI-era ending as bonus: completing the AI era multiplies that
       career's pending Legacy rather than gating ascension.
-- [ ] Legacy perk tree (spends from the banked pool): Muscle Memory,
+- [x] Legacy perk tree (spends from the banked pool): Muscle Memory,
       Industry Contacts, Dotfiles, "I've Seen This Before", Battle Scars,
       Reputation Precedes You.
-- [ ] AI-era theme: chat-product minimalism, purple gradients, sparkle
+- [x] AI-era theme: chat-product minimalism, purple gradients, sparkle
       icons — slightly too clean on purpose.
-- [ ] Ascension reskin: era tech-stack names shift each career (PHP→Rails
-      flavor, jQuery→Angular, …) — data-driven name tables.
-- [ ] Optional sound pass (default muted): WebAudio-synthesized keyboard
-      thock and cash ding; no audio files.
+- [ ] Ascension reskin: era tech-stack names shift each career — deferred
+      to a content pass.
+- [ ] Optional sound pass (default muted) — deferred.
 
 **Acceptance:** a full career is completable; second career starts
 faster via Legacy perks; the AI-era review loop feels like a different
