@@ -92,7 +92,19 @@ by era.
 - [ ] Era progress meter: completing tickets fills it; at threshold, an
       "Advance to <next era>" action appears (transition mechanics minimal
       for now — full soft-prestige lands in step 7).
-- [ ] Era-specific header/theme accent (small CSS touch per era).
+- [ ] Theming layer: refactor all component CSS to consume semantic
+      variables only (`--panel`, `--accent`, `--text-dim`, …); an era theme
+      is a variable set applied at the root (`data-era` attribute), plus at
+      most a few era-specific decorations. Components never restyled per
+      era.
+- [ ] HTML-era theme: Geocities energy — grey `#c0c0c0` bevels, Times
+      chrome, visitor counter in the footer.
+- [ ] PHP-era theme: phpBB beige/blue with gradient header bars.
+- [ ] Effects layer scaffold: one module for juice (floating `+N LoC`
+      numbers, combo glow, completion sweep) with flavor text in data;
+      respect `prefers-reduced-motion`.
+- [ ] Self-host the monospace font (JetBrains Mono or Fira Code); per-era
+      system-font stacks for UI chrome.
 
 **Acceptance:** new game starts typing 1998 HTML; PHP era reachable and
 brings new snippets/tickets/upgrades.
@@ -167,7 +179,10 @@ awful visual builder instead of the typing pane.
 **Tasks:**
 
 - [ ] WordBuildr UI shell: fake builder chrome — panels, accordions,
-      toolbar, canvas preview of a tacky client site.
+      toolbar, canvas preview of a tacky client site. Visually clashes
+      with every era theme on purpose: bright white corporate SaaS,
+      cheerful mascot, drop shadows (own stylesheet, exempt from the
+      semantic-variable theming rule).
 - [ ] Task engine: simple goals ("make the button blue", "bigger heading",
       "move the logo left") verified against builder state.
 - [ ] Hostile UX toolkit (each a small composable behavior): nested
@@ -206,6 +221,8 @@ client demands, rage-rewrite text. This step is mostly flavor by design.
       career.
 - [ ] Framework deprecation mechanic: JS-era framework upgrades decay on a
       timer with news-ticker announcements.
+- [ ] JS-era theme (early-2010s flat design, rounded corners arrive) and
+      SPA-era theme (modern dark IDE — roughly the v0 look).
 - [ ] Balance pass: staying in an old era plateaus; advancing is messy
       (proficiency reset → more bugs) but higher ceiling.
 
@@ -239,8 +256,12 @@ names.
       survived), full reset to HTML era.
 - [ ] Legacy perk tree: Muscle Memory, Industry Contacts, Dotfiles, "I've
       Seen This Before", Battle Scars, Reputation Precedes You.
+- [ ] AI-era theme: chat-product minimalism, purple gradients, sparkle
+      icons — slightly too clean on purpose.
 - [ ] Ascension reskin: era tech-stack names shift each career (PHP→Rails
       flavor, jQuery→Angular, …) — data-driven name tables.
+- [ ] Optional sound pass (default muted): WebAudio-synthesized keyboard
+      thock and cash ding; no audio files.
 
 **Acceptance:** a full career is completable; second career starts
 faster via Legacy perks; the AI-era review loop feels like a different
