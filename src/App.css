@@ -55,6 +55,12 @@ h1 {
   font-weight: bold;
 }
 
+.currency .legacy {
+  margin-left: 0.8rem;
+  color: var(--blue);
+  cursor: help;
+}
+
 .currency .rate {
   margin-left: 0.6rem;
   color: var(--dim);
@@ -181,6 +187,113 @@ main {
   color: var(--dim);
   font-size: 0.8rem;
   margin: 1rem 0 0;
+}
+
+.abandon {
+  margin-left: 0.6rem;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--dim);
+  font-family: inherit;
+  font-size: 0.75rem;
+  padding: 0.1rem 0.5rem;
+  cursor: pointer;
+}
+
+.abandon:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.no-ticket {
+  background: var(--panel);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  color: var(--dim);
+  margin-bottom: 1rem;
+}
+
+/* Ticket board */
+.board {
+  margin-top: 1.25rem;
+}
+
+.board h2 {
+  font-size: 1rem;
+  color: var(--dim);
+  margin: 0 0 0.6rem;
+}
+
+.board-count {
+  margin-left: 0.6rem;
+  font-weight: normal;
+  font-size: 0.8rem;
+}
+
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.6rem;
+}
+
+.ticket-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: left;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.6rem 0.7rem;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.ticket-card:hover:not(:disabled):not(.ticket-empty) {
+  border-color: var(--blue);
+}
+
+.ticket-card:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.ticket-card .ticket-type {
+  align-self: flex-start;
+}
+
+.ticket-card-client {
+  font-weight: bold;
+}
+
+.ticket-card-blurb {
+  color: var(--dim);
+  font-size: 0.72rem;
+}
+
+.ticket-card-footer {
+  display: flex;
+  justify-content: space-between;
+  color: var(--dim);
+  margin-top: 0.2rem;
+}
+
+.ticket-empty {
+  border-style: dashed;
+  color: var(--dim);
+  justify-content: center;
+  align-items: center;
+  cursor: default;
+}
+
+.board-empty {
+  color: var(--dim);
+  font-size: 0.85rem;
 }
 
 /* Shop */
