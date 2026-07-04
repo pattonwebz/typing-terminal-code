@@ -242,28 +242,29 @@ a business model, keep them alive with releases and marketing.
 
 **Tasks:**
 
-- [ ] `src/data/products.js`: product idea templates per era (name, LoC
+- [x] `src/data/products.js`: product idea templates per era (name, LoC
       budget, base appeal) + marketing channel definitions (era, cost,
       boost, duration, backfire chance for AI-slop).
-- [ ] Product projects: start one for Money, fill its LoC budget via
-      dedicated product tickets (typing gameplay, no client, no Money pay).
-- [ ] Launch flow: pick one-off / yearly license / monthly SaaS —
+- [x] Product projects: start one for Money, fill its LoC budget by
+      investing typed LoC (simpler than dedicated tickets; revisit if it
+      feels flat).
+- [x] Launch flow: pick one-off / yearly license / monthly SaaS —
       permanent per product.
-- [ ] Revenue engine (per game tick): one-off sales with market
+- [x] Revenue engine (per game tick): one-off sales with market
       saturation; yearly renewals gated on relevance; SaaS subscriber
       growth/churn with maintenance cost that exceeds revenue at launch
       and crosses over as subscribers compound.
-- [ ] Relevance decay clock per product (faster in later eras); scales all
+- [x] Relevance decay clock per product (faster in later eras); scales all
       three revenue models.
-- [ ] Upkeep tickets: update (small, relevance top-up), product bugfix
-      (spawned from the shared bug system; unfixed → churn), major release
-      (big snippet, cooldown, relevance + saturation reset, spike).
-- [ ] Marketing campaigns: Money → timed demand boost, diminishing
+- [x] Upkeep: update (LoC, relevance top-up) and major release (LoC,
+      relevance + saturation reset). Product bugfix tickets from the shared
+      bug system deferred. [ ] product-bugfix tickets
+- [x] Marketing campaigns: Money → timed demand boost, diminishing
       returns; word-of-mouth trickle scaled by product quality.
-- [ ] Portfolio UI panel: product cards with model, MRR/sales, relevance
+- [x] Portfolio UI panel: product cards with model, MRR/sales, relevance
       bar, bug count, action buttons (update / release / market / retire).
-- [ ] Ascension hook: retired/live products feed the Legacy formula.
-- [ ] Save migration.
+- [x] Ascension hook: retired/live products feed the Legacy formula.
+- [x] Save migration.
 
 **Acceptance:** a SaaS product visibly loses money at launch and becomes
 profitable if maintained; an abandoned product visibly dies; marketing
