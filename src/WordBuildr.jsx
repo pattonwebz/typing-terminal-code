@@ -18,7 +18,8 @@ function pick(arr) {
 
 // The deliberately awful builder. Own stylesheet vibe (bright SaaS), exempt
 // from era theming on purpose — the whiplash is the joke.
-export default function WordBuildr({ ticket, onComplete, onRewrite }) {
+export default function WordBuildr({ ticket, rageDiscount = 0, onComplete, onRewrite }) {
+  const rageMax = Math.max(2, RAGE_MAX - rageDiscount)
   // Tickets persist only { id, target }; rebuild text/check from templates.
   const goals = useMemo(
     () =>
@@ -47,7 +48,7 @@ export default function WordBuildr({ ticket, onComplete, onRewrite }) {
   const saveLabel = SAVE_LABELS[saveClicks % SAVE_LABELS.length]
 
   function addRage(n = 1) {
-    setRage((r) => Math.min(RAGE_MAX, r + n))
+    setRage((r) => Math.min(rageMax, r + n))
   }
 
   function togglePanel(node) {
@@ -204,10 +205,10 @@ export default function WordBuildr({ ticket, onComplete, onRewrite }) {
         <div className="wb-rage-bar">
           <div
             className="wb-rage-fill"
-            style={{ width: `${(rage / RAGE_MAX) * 100}%` }}
+            style={{ width: `${(rage / rageMax) * 100}%` }}
           />
         </div>
-        {rage >= RAGE_MAX && (
+        {rage >= rageMax && (
           <button className="wb-rewrite" onClick={onRewrite}>
             {REWRITE_COPY}
           </button>

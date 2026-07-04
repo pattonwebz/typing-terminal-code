@@ -1,10 +1,17 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   useGameState,
   pendingLegacy,
+  effectiveProficiency,
   techDebt,
   TECH_DEBT_SOFT_CAP,
 } from './useGameState.js'
+import {
+  LEGACY_PERKS,
+  legacyPerkCost,
+  deriveLegacyStats,
+} from './data/legacyPerks.js'
+import AIReviewPane from './AIReviewPane.jsx'
 import { upgradeCost, visibleUpgrades } from './upgrades.js'
 import { XP_UPGRADES, xpUpgradeCost } from './data/xpUpgrades.js'
 import { CLIENTS } from './data/clients.js'
@@ -69,17 +76,27 @@ export default function App() {
     buyXp,
     startProduct,
     productAction,
+    shipBadHunk,
+    ascend,
+    buyLegacy,
     reset,
   } = useGameState()
+  // AI-era flow: after typing the prompt, review the AI's hunks.
+  const [reviewing, setReviewing] = useState(false)
   // stable identities for TypingPane's keydown effect
   const onEarn = useCallback(earn, []) // eslint-disable-line react-hooks/exhaustive-deps
-  const onComplete = useCallback(completeTicket, []) // eslint-disable-line react-hooks/exhaustive-deps
+  const onComplete = useCallback(() => {
+    setReviewing(false)
+    completeTicket()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const onMiss = useCallback(noteTypo, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const ticket = state.tickets.active
   const client = ticket && CLIENTS.find((c) => c.id === ticket.clientId)
   const legacy = pendingLegacy(state)
   const debt = techDebt(state)
+  const legacyStats = deriveLegacyStats(state.legacyOwned)
+  const effProf = effectiveProficiency(state, state.era)
 
   const era = getEra(state.era)
   const next = nextEra(state.era)
@@ -125,6 +142,27 @@ export default function App() {
           tech debt {debt}/{TECH_DEBT_SOFT_CAP}
           {debt > TECH_DEBT_SOFT_CAP && ' — earnings −25%'}
         </span>
+        {state.unmaintainability > 0 && (
+          <span
+            className={state.unmaintainability > 40 ? 'debt-high' : undefined}
+            title="Unmaintainable code: it works, but every future bug costs more. Bugfixes chip away at it."
+          >
+            unmaintainable {Math.round(state.unmaintainability)}%
+          </span>
+        )}
+        {legacy > 0 && (
+          <button
+            className="ascend"
+            title="Bank pending Legacy and restart from 1998. Legacy perks persist forever."
+            onClick={() =>
+              confirm(
+                `Ascend? You bank ☆${legacy} Legacy (total ☆${state.legacy.banked + legacy}) and start a new career in the HTML era. Perks persist; everything else resets.`
+              ) && ascend()
+            }
+          >
+            ascend (bank ☆{legacy})
+          </button>
+        )}
       </div>
 
       {state.offlineEarned > 0 && (
@@ -179,6 +217,7 @@ export default function App() {
               {ticket.type === 'clientRequest' ? (
                 <WordBuildr
                   ticket={ticket}
+                  rageDiscount={legacyStats.rageDiscount}
                   onComplete={onComplete}
                   onRewrite={rewriteTicket}
                 />
@@ -188,19 +227,33 @@ export default function App() {
                   stats={stats}
                   // Half-mastered era: you can spot your classic mistakes.
                   highlightBugs={
-                    eraDone >= era.proficiency.ticketsToMaster / 2
+                    effProf >=
+                    (era.proficiency.ticketsToMaster / 2) *
+                      legacyStats.highlightFactor
                   }
                   onEarn={onEarn}
                   onComplete={onComplete}
                 />
               ) : (
-                <TypingPane
-                  snippet={ticket.snippet}
-                  stats={stats}
-                  onEarn={onEarn}
-                  onComplete={onComplete}
-                  onMiss={onMiss}
-                />
+                state.era === 'ai' && reviewing ? (
+                  <AIReviewPane
+                    ticket={ticket}
+                    proficient={effProf >= era.proficiency.ticketsToMaster / 3}
+                    onEarn={onEarn}
+                    onShipBad={shipBadHunk}
+                    onComplete={onComplete}
+                  />
+                ) : (
+                  <TypingPane
+                    snippet={ticket.snippet}
+                    stats={stats}
+                    onEarn={onEarn}
+                    onComplete={
+                      state.era === 'ai' ? () => setReviewing(true) : onComplete
+                    }
+                    onMiss={onMiss}
+                  />
+                )
               )}
             </>
           ) : (
@@ -256,6 +309,33 @@ export default function App() {
                     <span className="upgrade-desc">{u.desc}</span>
                     <span className="upgrade-cost">
                       {maxed ? 'MAXED' : `${cost} XP`}
+                    </span>
+                  </button>
+                )
+              })}
+            </>
+          )}
+          {(state.legacy.banked > 0 ||
+            Object.keys(state.legacyOwned).length > 0) && (
+            <>
+              <h2>Legacy (☆{state.legacy.banked} banked)</h2>
+              {LEGACY_PERKS.map((u) => {
+                const n = state.legacyOwned[u.id] ?? 0
+                const cost = legacyPerkCost(u, n)
+                const maxed = n >= u.max
+                return (
+                  <button
+                    key={u.id}
+                    className="upgrade"
+                    disabled={maxed || state.legacy.banked < cost}
+                    onClick={() => buyLegacy(u.id)}
+                  >
+                    <span className="upgrade-name">
+                      {u.name} {n > 0 && <em>x{n}</em>}
+                    </span>
+                    <span className="upgrade-desc">{u.desc}</span>
+                    <span className="upgrade-cost">
+                      {maxed ? 'MAXED' : `☆${cost}`}
                     </span>
                   </button>
                 )

@@ -802,3 +802,55 @@ footer {
 .product-actions button:disabled { opacity: 0.45; cursor: default; }
 
 .product-stat { color: var(--dim); }
+
+/* AI era theme: chat-product minimalism, slightly too clean on purpose. */
+:root[data-era='ai'] {
+  --bg: #faf9fd;
+  --panel: #ffffff;
+  --border: #e4defc;
+  --text: #2d2a3e;
+  --dim: #8e86b3;
+  --green: #7c3aed;
+  --amber: #b45309;
+  --red: #dc2626;
+  --blue: #6d28d9;
+  --font-ui: 'Segoe UI', system-ui, sans-serif;
+  --radius: 12px;
+}
+
+/* AI review pane */
+.ai-actions { display: flex; gap: 0.6rem; margin-top: 1rem; }
+
+.ai-actions button {
+  font-family: var(--font-code);
+  font-weight: bold;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+}
+
+.ai-accept { background: var(--green); color: #fff; }
+.ai-reject { background: var(--red); color: #fff; }
+
+.ai-tell { color: var(--amber); }
+
+.ai-log {
+  margin-top: 0.8rem;
+  font-size: 0.75rem;
+  color: var(--dim);
+}
+
+.ascend {
+  margin-left: auto;
+  font-family: inherit;
+  font-size: 0.78rem;
+  background: none;
+  border: 1px solid var(--blue);
+  border-radius: var(--radius);
+  color: var(--blue);
+  padding: 0.15rem 0.6rem;
+  cursor: pointer;
+}
+
+.ascend:hover { background: var(--blue); color: var(--bg); }

@@ -6,6 +6,11 @@ import { createTicket, shipRate } from './tickets.js'
 import { getEra, nextEra } from './data/eras.js'
 import { CLIENTS, clientsForEra } from './data/clients.js'
 import { newProduct, tickProduct } from './products.js'
+import {
+  LEGACY_PERKS,
+  legacyPerkCost,
+  deriveLegacyStats,
+} from './data/legacyPerks.js'
 import { PRODUCT_ECONOMY } from './data/products.js'
 
 const SAVE_KEY = 'typing-terminal-save-v3'
@@ -53,7 +58,10 @@ function emptyState() {
     frameworks: {},
     news: null,
     products: [],
+    // AI-era rot: raises bug discovery; bugfixes chip away at it
+    unmaintainability: 0,
     legacy: { banked: 0 },
+    legacyOwned: {},
     offlineEarned: 0,
   }
 }
@@ -88,7 +96,9 @@ function migrate(save) {
     frameworks: save.frameworks ?? {},
     news: save.news ?? null,
     products: save.products ?? [],
+    unmaintainability: save.unmaintainability ?? 0,
     legacy: save.legacy ?? { banked: 0 },
+    legacyOwned: save.legacyOwned ?? {},
   }
 }
 
@@ -107,7 +117,18 @@ function loadSave() {
 }
 
 export function pendingLegacy(state) {
-  return Math.floor(Math.sqrt(state.lifetimeScore / LEGACY_DIVISOR))
+  const base = Math.floor(Math.sqrt(state.lifetimeScore / LEGACY_DIVISOR))
+  // Surviving deep into the AI era doubles the career's pending Legacy.
+  return (state.proficiency?.ai ?? 0) >= 10 ? base * 2 : base
+}
+
+// Muscle Memory (Legacy perk) counts as virtual era experience for the
+// bug-rate curve and Fix-It highlighting, not for era-advance gating.
+export function effectiveProficiency(state, eraId) {
+  return (
+    (state.proficiency[eraId] ?? 0) +
+    deriveLegacyStats(state.legacyOwned).startProficiency
+  )
 }
 
 export function techDebt(state) {
@@ -159,6 +180,13 @@ export function useGameState() {
   statsRef.current = stats
   const xpStatsRef = useRef(xpStats)
   xpStatsRef.current = xpStats
+  // reputation floor: max of career (Networking) and permanent (Legacy) perks
+  const repFloor = Math.max(
+    xpStats.repFloor,
+    deriveLegacyStats(state.legacyOwned).repFloor
+  )
+  const repFloorRef = useRef(repFloor)
+  repFloorRef.current = repFloor
 
   // Passive income tick — and automation quietly shipping bugs.
   useEffect(() => {
@@ -216,14 +244,16 @@ export function useGameState() {
         if (s.tickets.open.length >= statsRef.current.boardSlots) return s
         const found = s.codebase.find((b) => {
           const client = CLIENTS.find((c) => c.id === b.clientId)
-          const mult = client?.tags.includes('nitpicky') ? 2 : 1
+          const mult =
+            (client?.tags.includes('nitpicky') ? 2 : 1) *
+            (1 + s.unmaintainability / 50)
           return Math.random() < DISCOVERY_CHANCE * mult
         })
         if (!found) return s
         return {
           ...s,
           codebase: s.codebase.filter((b) => b !== found),
-          reputation: clampRep(s.reputation - 2, xpStatsRef.current.repFloor),
+          reputation: clampRep(s.reputation - 2, repFloorRef.current),
           tickets: {
             ...s.tickets,
             open: [
@@ -352,7 +382,7 @@ export function useGameState() {
   function abandonTicket() {
     setState((s) => ({
       ...s,
-      reputation: clampRep(s.reputation - 1, xpStatsRef.current.repFloor),
+      reputation: clampRep(s.reputation - 1, repFloorRef.current),
       activeTypos: 0,
       tickets: { ...s.tickets, active: null },
     }))
@@ -365,7 +395,7 @@ export function useGameState() {
     setState((s) => {
       const done = s.tickets.active
       if (!done) return s
-      const rate = shipRate(s.era, s.proficiency[s.era])
+      const rate = shipRate(s.era, effectiveProficiency(s, s.era))
       let shipped = 0
       if (done.type !== 'bugfix') {
         for (let i = 0; i < s.activeTypos; i++) {
@@ -381,8 +411,13 @@ export function useGameState() {
       }))
       const repDelta =
         done.type === 'bugfix' ? +3 : shipped === 0 ? +1 : 0
+      const unm =
+        done.type === 'bugfix'
+          ? Math.max(0, s.unmaintainability - 2)
+          : s.unmaintainability
       return {
         ...s,
+        unmaintainability: unm,
         currencies: {
           ...s.currencies,
           money: s.currencies.money + done.payMoney,
@@ -394,7 +429,7 @@ export function useGameState() {
           [s.era]: (s.proficiency[s.era] ?? 0) + 1,
         },
         codebase: [...s.codebase, ...newBugs],
-        reputation: clampRep(s.reputation + repDelta, xpStatsRef.current.repFloor),
+        reputation: clampRep(s.reputation + repDelta, repFloorRef.current),
         activeTypos: 0,
         tickets: {
           ...s.tickets,
@@ -558,6 +593,52 @@ export function useGameState() {
     })
   }
 
+  // AI review: a bad hunk shipped. The codebase remembers.
+  function shipBadHunk() {
+    setState((s) => {
+      const client = pickRandom(clientsForEra(s.era))
+      return {
+        ...s,
+        unmaintainability: Math.min(100, s.unmaintainability + 5),
+        codebase: [
+          ...s.codebase,
+          { clientId: client.id, era: s.era, createdAt: Date.now() },
+        ],
+      }
+    })
+  }
+
+  // Hard prestige: bank pending Legacy, restart the career from 1998.
+  // Legacy and perks survive; perks shape the fresh start.
+  function ascend() {
+    setState((s) => {
+      const banked = s.legacy.banked + pendingLegacy(s)
+      const perks = deriveLegacyStats(s.legacyOwned)
+      const fresh = emptyState()
+      fresh.legacy = { banked }
+      fresh.legacyOwned = s.legacyOwned
+      fresh.reputation = perks.startReputation
+      if (perks.startKeyboards > 0)
+        fresh.owned = { 'mech-keyboard': perks.startKeyboards }
+      fresh.tickets.open = [createTicket(fresh.era, 0)]
+      return fresh
+    })
+  }
+
+  function buyLegacy(perkId) {
+    const perk = LEGACY_PERKS.find((p) => p.id === perkId)
+    setState((s) => {
+      const n = s.legacyOwned[perkId] ?? 0
+      const cost = legacyPerkCost(perk, n)
+      if (n >= perk.max || s.legacy.banked < cost) return s
+      return {
+        ...s,
+        legacy: { banked: s.legacy.banked - cost },
+        legacyOwned: { ...s.legacyOwned, [perkId]: n + 1 },
+      }
+    })
+  }
+
   function reset() {
     localStorage.removeItem(SAVE_KEY)
     for (const key of OLD_KEYS) localStorage.removeItem(key)
@@ -580,6 +661,9 @@ export function useGameState() {
     buyXp,
     startProduct,
     productAction,
+    shipBadHunk,
+    ascend,
+    buyLegacy,
     reset,
   }
 }
