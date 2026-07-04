@@ -55,18 +55,18 @@ currency.
 
 **Tasks:**
 
-- [ ] Board UI: 3–5 open ticket cards (client, type, pay, snippet-length
+- [x] Board UI: 3–5 open ticket cards (client, type, pay, snippet-length
       hint); click to make active; active ticket feeds the typing pane.
-- [ ] Ticket generator: spawns tickets over time up to board capacity,
+- [x] Ticket generator: spawns tickets over time up to board capacity,
       weighted by era and ticket-type spawn weights.
-- [ ] Completing a ticket pays LoC (typing, as today) **plus** Money on
+- [x] Completing a ticket pays LoC (typing, as today) **plus** Money on
       completion; header shows both currencies.
-- [ ] Split the shop: skill upgrades cost LoC, business upgrades cost
+- [x] Split the shop: skill upgrades cost LoC, business upgrades cost
       Money (move Intern to Money; add 1–2 Money upgrades, e.g. "Better
       Chair" and "Ticket Slot +1").
-- [ ] Abandon-ticket action (small reputation-free penalty for now; real
+- [x] Abandon-ticket action (small reputation-free penalty for now; real
       reputation arrives in step 5).
-- [ ] Save migration v2→v3.
+- [x] Save migration v2→v3.
 
 **Acceptance:** you always work *on a ticket*; board refills over time;
 two currencies earn and spend independently.
