@@ -147,18 +147,18 @@ ignoring them costs you.
 
 **Tasks:**
 
-- [ ] Shipped bugs: a fraction of typos during a ticket (rate from era
+- [x] Shipped bugs: a fraction of typos during a ticket (rate from era
       proficiency) attach to the completed ticket as dormant bugs.
-- [ ] Passive-income bug rate: intern/automation LoC batches add dormant
+- [x] Passive-income bug rate: intern/automation LoC batches add dormant
       bugs to a general "codebase" pool.
-- [ ] Client discovery: timer + weighted roll turns dormant bugs into
+- [x] Client discovery: timer + weighted roll turns dormant bugs into
       bugfix tickets tagged to the original client.
-- [ ] Reputation stat per client + overall: rises on clean/prompt work,
+- [x] Reputation stat per client + overall: rises on clean/prompt work,
       bleeds while discovered bugs sit unfixed; gates ticket quality/pay.
-- [ ] Tech Debt meter: grows with the dormant-bug pool; applies a soft
+- [x] Tech Debt meter: grows with the dormant-bug pool; applies a soft
       earnings penalty above a threshold; reduced by completing bugfix
       tickets.
-- [ ] Proficiency progression: completing tickets in an era lowers your
+- [x] Proficiency progression: completing tickets in an era lowers your
       ship-bug rate for that era (the "you get better" curve from
       DESIGN.md).
 
