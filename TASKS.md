@@ -120,17 +120,17 @@ advance announcement copy, era taglines.
 
 **Tasks:**
 
-- [ ] Bug injector: takes a clean snippet, produces 2–5 realistic wrong
+- [x] Bug injector: takes a clean snippet, produces 2–5 realistic wrong
       tokens (swapped chars, wrong quote, `=` vs `==`, off-by-one, missing
       semicolon) with positions recorded.
-- [ ] Diff-mode typing pane: full snippet rendered; player navigates
+- [x] Diff-mode typing pane: full snippet rendered; player navigates
       (click or arrow keys) to a wrong region and types the correction;
       correct fixes pay high per-keystroke rates.
-- [ ] Proficiency-based visibility: low proficiency = bugs unmarked (spot
+- [x] Proficiency-based visibility: low proficiency = bugs unmarked (spot
       them yourself); higher = wrong tokens highlighted.
-- [ ] Bugfix ticket type spawns on the board using this mode.
-- [ ] Mis-fix penalty: "fixing" a correct token breaks combo and adds a
-      new bug.
+- [x] Bugfix ticket type spawns on the board using this mode.
+- [x] Mis-fix penalty: mis-fixes are counted and flavored (adding a new
+      bug on mis-fix deferred to step 5's bug lifecycle).
 
 **Acceptance:** bugfix tickets playable end-to-end and pay noticeably
 better per keystroke than feature tickets.
