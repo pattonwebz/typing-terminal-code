@@ -65,6 +65,12 @@ Mechanics live in DESIGN.md; this file is pure tone.
 - Retirement eulogy: "HitCounter Pro (1999–2004). It counted. It was
   enough."
 
+## Automation
+- Autotyper Macro flavor: an AutoHotkey script held together with prayer.
+  Higher levels could rename: "Macro" → "Vim Golfer" → "Keyboard Ghost".
+- Junior PM flavor lines when auto-picking: "assigned you a ticket. It
+  seemed urgent. It was alphabetically first."
+
 ## Misc / unsorted
 - Achievement idea: "Semicolon Purist" — finish a JS era without a single
   missed `;`.
