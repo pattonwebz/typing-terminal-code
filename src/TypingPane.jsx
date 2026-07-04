@@ -4,9 +4,14 @@ import { floatText } from './effects.js'
 
 const COMPLETION_BONUS_PER_CHAR = 2
 
+// Chance per auto-typed character that the macro fat-fingers it (counts as
+// a typo for the bug system — automation is never free).
+const AUTO_TYPO_CHANCE = 0.03
+
 // Controlled typing engine: the active ticket supplies the snippet; the
 // parent is told when it's fully typed so it can pay out and rotate tickets.
-export default function TypingPane({ snippet, stats, onEarn, onComplete, onMiss }) {
+// autoCps > 0 makes the Autotyper Macro type for you, slowly.
+export default function TypingPane({ snippet, stats, onEarn, onComplete, onMiss, autoCps = 0 }) {
   const [pos, setPos] = useState(0)
   const [combo, setCombo] = useState(0)
   const [lastEvent, setLastEvent] = useState(null) // 'crit' | 'miss' | 'done'
@@ -19,6 +24,44 @@ export default function TypingPane({ snippet, stats, onEarn, onComplete, onMiss 
   useEffect(() => {
     setPos(0)
   }, [snippet])
+
+  // Autotyper: fires the same earn/advance path as a real keystroke, at a
+  // sedate pace, with the occasional shipped typo.
+  useEffect(() => {
+    if (autoCps <= 0) return
+    const t = setInterval(() => {
+      if (Math.random() < AUTO_TYPO_CHANCE) {
+        setCombo(0)
+        setLastEvent('miss')
+        onMiss?.()
+        return
+      }
+      const crit = Math.random() < stats.critChance
+      const amount =
+        stats.perChar *
+        stats.multiplier *
+        tier.multiplier *
+        comboMult *
+        (crit ? 10 : 1)
+      onEarn(Math.round(amount * 10) / 10)
+      setCombo((c) => c + 1)
+      setLastEvent(crit ? 'crit' : null)
+      if (pos + 1 >= snippet.code.length) {
+        const bonus = Math.round(
+          snippet.code.length *
+            COMPLETION_BONUS_PER_CHAR *
+            stats.multiplier *
+            tier.multiplier
+        )
+        onEarn(bonus)
+        setLastEvent('done')
+        onComplete()
+      } else {
+        setPos(pos + 1)
+      }
+    }, 1000 / autoCps)
+    return () => clearInterval(t)
+  }, [autoCps, snippet, pos, stats, tier, comboMult, onEarn, onComplete, onMiss])
 
   useEffect(() => {
     function onKey(e) {

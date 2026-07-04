@@ -108,6 +108,28 @@ export const UPGRADES = [
     max: 4,
   },
   {
+    id: 'auto-typer',
+    name: 'Autotyper Macro',
+    desc: 'Types the active ticket for you: +1 char/sec per level. Slow, occasionally sloppy.',
+    currency: 'money',
+    type: 'autoType',
+    value: 1,
+    baseCost: 8000,
+    costGrowth: 3,
+    max: 3,
+  },
+  {
+    id: 'auto-pm',
+    name: 'Junior PM',
+    desc: 'Auto-picks the next ticket off the board (never WordBuildr — they have limits).',
+    currency: 'money',
+    type: 'autoPick',
+    value: 1,
+    baseCost: 6000,
+    costGrowth: 1,
+    max: 1,
+  },
+  {
     id: 'ticket-slot',
     name: 'Second Inbox',
     desc: '+1 ticket slot on the board',
@@ -140,6 +162,8 @@ export function deriveStats(owned, frameworks = {}) {
     passiveRate: 0,
     comboBoost: 1,
     boardSlots: 3,
+    autoTypeCps: 0,
+    autoPick: false,
   }
   for (const u of UPGRADES) {
     const n = owned[u.id] ?? 0
@@ -150,6 +174,8 @@ export function deriveStats(owned, frameworks = {}) {
     if (u.type === 'passive') stats.passiveRate += u.value * n
     if (u.type === 'comboBoost') stats.comboBoost += u.value * n
     if (u.type === 'boardSlot') stats.boardSlots += u.value * n
+    if (u.type === 'autoType') stats.autoTypeCps += u.value * n
+    if (u.type === 'autoPick') stats.autoPick = true
     if (u.type === 'framework')
       stats.multiplier *= frameworks[u.id]?.deprecated
         ? u.deprecatedValue

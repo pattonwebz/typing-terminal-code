@@ -854,3 +854,11 @@ footer {
 }
 
 .ascend:hover { background: var(--blue); color: var(--bg); }
+
+.auto-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  user-select: none;
+}

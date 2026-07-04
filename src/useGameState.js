@@ -57,6 +57,8 @@ function emptyState() {
     // frameworks: { [upgradeId]: { boughtAt, deprecated } }
     frameworks: {},
     news: null,
+    // owner switches for owned automation upgrades
+    toggles: { autoType: true, autoPick: true },
     products: [],
     // AI-era rot: raises bug discovery; bugfixes chip away at it
     unmaintainability: 0,
@@ -95,6 +97,7 @@ function migrate(save) {
     xpOwned: save.xpOwned ?? {},
     frameworks: save.frameworks ?? {},
     news: save.news ?? null,
+    toggles: save.toggles ?? { autoType: true, autoPick: true },
     products: save.products ?? [],
     unmaintainability: save.unmaintainability ?? 0,
     legacy: save.legacy ?? { banked: 0 },
@@ -232,6 +235,33 @@ export function useGameState() {
         }
       })
     }, TICKET_SPAWN_MS)
+    return () => clearInterval(t)
+  }, [])
+
+  // Junior PM: auto-pick the next ticket when idle. Prefers typing work,
+  // will hand you a Fix-It, refuses to open WordBuildr on your behalf.
+  useEffect(() => {
+    const t = setInterval(() => {
+      if (!statsRef.current.autoPick) return
+      setState((s) => {
+        if (!s.toggles.autoPick || s.tickets.active) return s
+        const candidates = s.tickets.open.filter(
+          (t) => t.type !== 'clientRequest'
+        )
+        const ticket =
+          candidates.find((t) => t.type !== 'bugfix') ?? candidates[0]
+        if (!ticket) return s
+        return {
+          ...s,
+          activeTypos: 0,
+          tickets: {
+            ...s.tickets,
+            open: s.tickets.open.filter((t) => t.id !== ticket.id),
+            active: ticket,
+          },
+        }
+      })
+    }, 2000)
     return () => clearInterval(t)
   }, [])
 
@@ -490,6 +520,13 @@ export function useGameState() {
     })
   }
 
+  function toggleAutomation(key) {
+    setState((s) => ({
+      ...s,
+      toggles: { ...s.toggles, [key]: !s.toggles[key] },
+    }))
+  }
+
   function buy(upgradeId) {
     const upgrade = UPGRADES.find((u) => u.id === upgradeId)
     setState((s) => {
@@ -659,6 +696,7 @@ export function useGameState() {
     rewriteTicket,
     buy,
     buyXp,
+    toggleAutomation,
     startProduct,
     productAction,
     shipBadHunk,

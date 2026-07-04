@@ -74,6 +74,7 @@ export default function App() {
     advanceEra,
     buy,
     buyXp,
+    toggleAutomation,
     startProduct,
     productAction,
     shipBadHunk,
@@ -149,6 +150,26 @@ export default function App() {
           >
             unmaintainable {Math.round(state.unmaintainability)}%
           </span>
+        )}
+        {stats.autoTypeCps > 0 && (
+          <label className="auto-toggle" title="Autotyper Macro: types the active ticket slowly. Occasionally sloppy.">
+            <input
+              type="checkbox"
+              checked={state.toggles.autoType}
+              onChange={() => toggleAutomation('autoType')}
+            />
+            autotype ({stats.autoTypeCps}/s)
+          </label>
+        )}
+        {stats.autoPick && (
+          <label className="auto-toggle" title="Junior PM: picks the next ticket when you're idle. Won't touch WordBuildr.">
+            <input
+              type="checkbox"
+              checked={state.toggles.autoPick}
+              onChange={() => toggleAutomation('autoPick')}
+            />
+            auto-pick
+          </label>
         )}
         {legacy > 0 && (
           <button
@@ -247,6 +268,7 @@ export default function App() {
                   <TypingPane
                     snippet={ticket.snippet}
                     stats={stats}
+                    autoCps={state.toggles.autoType ? stats.autoTypeCps : 0}
                     onEarn={onEarn}
                     onComplete={
                       state.era === 'ai' ? () => setReviewing(true) : onComplete
