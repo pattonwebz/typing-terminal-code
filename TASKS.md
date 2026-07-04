@@ -84,27 +84,27 @@ by era.
 
 **Tasks:**
 
-- [ ] HTML-era snippet bank (~20 snippets): `<table>` layouts, `<font>`,
+- [x] HTML-era snippet bank (~20 snippets): `<table>` layouts, `<font>`,
       `<marquee>`, inline styles, framesets. Tiered short→long.
-- [ ] PHP-era snippet bank (~15 snippets) so era 2 exists to advance into.
-- [ ] Gate snippets, ticket types, clients, and upgrades by era (data-level
-      `era` fields + a `visibleIn(era)` helper).
-- [ ] Era progress meter: completing tickets fills it; at threshold, an
+- [x] PHP-era snippet bank (~15 snippets) so era 2 exists to advance into.
+- [x] Gate snippets, ticket types, and clients by era. (Upgrade era-gating
+      deferred to step 7, where era-specific upgrades are introduced.)
+- [x] Era progress meter: completing tickets fills it; at threshold, an
       "Advance to <next era>" action appears (transition mechanics minimal
       for now — full soft-prestige lands in step 7).
-- [ ] Theming layer: refactor all component CSS to consume semantic
+- [x] Theming layer: refactor all component CSS to consume semantic
       variables only (`--panel`, `--accent`, `--text-dim`, …); an era theme
       is a variable set applied at the root (`data-era` attribute), plus at
       most a few era-specific decorations. Components never restyled per
       era.
-- [ ] HTML-era theme: Geocities energy — grey `#c0c0c0` bevels, Times
+- [x] HTML-era theme: Geocities energy — grey `#c0c0c0` bevels, Times
       chrome, visitor counter in the footer.
-- [ ] PHP-era theme: phpBB beige/blue with gradient header bars.
-- [ ] Effects layer scaffold: one module for juice (floating `+N LoC`
+- [x] PHP-era theme: phpBB beige/blue with gradient header bars.
+- [x] Effects layer scaffold: one module for juice (floating `+N LoC`
       numbers, combo glow, completion sweep) with flavor text in data;
       respect `prefers-reduced-motion`.
-- [ ] Self-host the monospace font (JetBrains Mono or Fira Code); per-era
-      system-font stacks for UI chrome.
+- [ ] Self-host the monospace font (JetBrains Mono or Fira Code) — deferred;
+      per-era system-font stacks for UI chrome are done (--font-ui var).
 
 **Acceptance:** new game starts typing 1998 HTML; PHP era reachable and
 brings new snippets/tickets/upgrades.
