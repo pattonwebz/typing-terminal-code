@@ -24,20 +24,20 @@ of eras, clients, and tickets, without changing visible gameplay yet.
 
 **Tasks:**
 
-- [ ] Define `src/data/eras.js`: id, name, year/vibe, unlock order, snippet
+- [x] Define `src/data/eras.js`: id, name, year/vibe, unlock order, snippet
       pool key, base pay multiplier, proficiency curve params (placeholder
       numbers fine; tuned later).
-- [ ] Define `src/data/clients.js`: id, name, blurb, personality tags
+- [x] Define `src/data/clients.js`: id, name, blurb, personality tags
       (patient/nitpicky/cheap/whale), which eras they appear in.
-- [ ] Define `src/data/ticketTypes.js`: feature / bugfix / clientRequest /
+- [x] Define `src/data/ticketTypes.js`: feature / bugfix / clientRequest /
       rush / refactor — pay formula inputs, snippet length range, spawn
       weights per era.
-- [ ] Introduce a `Ticket` shape: `{ id, type, clientId, era, snippet,
+- [x] Introduce a `Ticket` shape: `{ id, type, clientId, era, snippet,
       payLoC, payMoney, createdAt, deadline?, shippedBugs[] }`.
-- [ ] Restructure game state: `{ currencies: { loc, money }, era,
+- [x] Restructure game state: `{ currencies: { loc, money }, era,
       proficiency, owned, tickets: { open, active, completed }, savedAt }`.
       Write a v1→v2 save migration.
-- [ ] Keep current gameplay working on top of the new model (a single
+- [x] Keep current gameplay working on top of the new model (a single
       auto-picked feature ticket behaves like today's random snippet).
 
 **Acceptance:** game plays identically to v0; state shape and data files
