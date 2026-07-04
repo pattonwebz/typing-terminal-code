@@ -246,6 +246,7 @@ export default function App() {
                 <FixItPane
                   ticket={ticket}
                   stats={stats}
+                  canAfford={(n) => state.currencies.loc >= n}
                   // Half-mastered era: you can spot your classic mistakes.
                   highlightBugs={
                     effProf >=

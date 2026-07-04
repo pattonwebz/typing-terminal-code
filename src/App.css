@@ -1063,3 +1063,89 @@ footer { font-style: italic; }
   .ticket-card:hover:not(:disabled):not(.ticket-empty),
   .upgrade:hover:not(:disabled) { transform: none; }
 }
+
+/* Fix-It mode: unmistakably not a typing ticket */
+.fixit-pane {
+  border-top: 2px solid var(--red);
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0 14px,
+      color-mix(in srgb, var(--red) 4%, transparent) 14px 16px
+    ),
+    var(--panel);
+}
+
+.fixit-banner {
+  background: color-mix(in srgb, var(--red) 14%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--red) 45%, var(--border));
+  border-radius: var(--radius);
+  color: var(--red);
+  font-weight: bold;
+  font-size: 0.8rem;
+  padding: 0.45rem 0.7rem;
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.03em;
+}
+
+.fixit-tag {
+  color: var(--red) !important;
+  border-color: var(--red);
+}
+
+.fixit-snippet {
+  border-color: color-mix(in srgb, var(--red) 35%, var(--border));
+}
+
+.fixit-pane .cursor {
+  background: var(--red);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--red) 45%, transparent);
+}
+
+.bug-hint {
+  background: color-mix(in srgb, var(--red) 30%, transparent);
+  border-bottom: 2px solid var(--red);
+  animation: bug-throb 1.2s ease-in-out infinite;
+}
+
+@keyframes bug-throb {
+  50% { background: color-mix(in srgb, var(--red) 50%, transparent); }
+}
+
+.lint-btn {
+  margin-left: auto;
+  font-family: var(--font-code);
+  font-size: 0.72rem;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  padding: 0.15rem 0.6rem;
+  cursor: pointer;
+}
+
+.lint-btn:hover:not(:disabled) { border-color: var(--amber); color: var(--amber); }
+.lint-btn:disabled { opacity: 0.45; cursor: default; }
+
+/* Linter output: little terminal under the code */
+.lint-output {
+  margin-top: 0.7rem;
+  background: color-mix(in srgb, var(--bg) 80%, var(--panel));
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--red);
+  border-radius: var(--radius);
+  font-family: var(--font-code);
+  font-size: 0.78rem;
+  padding: 0.5rem 0.7rem;
+}
+
+.lint-line { color: var(--red); cursor: pointer; line-height: 1.7; }
+.lint-line:hover { text-decoration: underline; }
+.lint-loc { color: var(--dim); }
+.lint-fix { color: var(--green); font-weight: bold; }
+.lint-quiet { color: var(--dim); cursor: default; }
+.lint-quiet:hover { text-decoration: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bug-hint { animation: none; }
+}

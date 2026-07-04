@@ -378,9 +378,12 @@ export function useGameState() {
       const gained = amount * debtPenalty
       return {
         ...s,
-        currencies: { ...s.currencies, loc: s.currencies.loc + gained },
-        lifetimeLoc: s.lifetimeLoc + gained,
-        lifetimeScore: s.lifetimeScore + gained,
+        currencies: {
+          ...s.currencies,
+          loc: Math.max(0, s.currencies.loc + gained),
+        },
+        lifetimeLoc: s.lifetimeLoc + Math.max(0, gained),
+        lifetimeScore: s.lifetimeScore + Math.max(0, gained),
       }
     })
   }
