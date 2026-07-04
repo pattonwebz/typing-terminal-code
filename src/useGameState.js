@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { UPGRADES, upgradeCost, deriveStats } from './upgrades.js'
 import { createTicket } from './tickets.js'
+import { getEra, nextEra } from './data/eras.js'
 
 const SAVE_KEY = 'typing-terminal-save-v3'
 const OLD_KEYS = ['typing-terminal-save-v1', 'typing-terminal-save-v2']
 // Cap offline earnings so a week away doesn't trivialize the economy.
 const MAX_OFFLINE_SECONDS = 4 * 60 * 60
 const TICKET_SPAWN_MS = 8000
-// Starting era is 'spa' until era snippet banks land (step 3), so gameplay
-// matches v0's modern-JS snippet bank.
-const STARTING_ERA = 'spa'
+const STARTING_ERA = 'html'
 // Pending Legacy (prestige, DESIGN.md) accrues sublinearly from a weighted
 // lifetime score, visible from the very beginning of the game.
 const LEGACY_DIVISOR = 2500
@@ -209,6 +208,26 @@ export function useGameState() {
     })
   }
 
+  // Move to the next era once enough tickets are completed in the current
+  // one. Board and active ticket are dropped — new era, new backlog.
+  // (Full soft-prestige with Experience lands in step 7.)
+  function advanceEra() {
+    setState((s) => {
+      const next = nextEra(s.era)
+      const need = getEra(s.era).ticketsToAdvance
+      if (!next || need == null || (s.proficiency[s.era] ?? 0) < need) return s
+      return {
+        ...s,
+        era: next.id,
+        tickets: {
+          ...s.tickets,
+          open: [createTicket(next.id, s.lifetimeLoc)],
+          active: null,
+        },
+      }
+    })
+  }
+
   function buy(upgradeId) {
     const upgrade = UPGRADES.find((u) => u.id === upgradeId)
     setState((s) => {
@@ -239,6 +258,7 @@ export function useGameState() {
     state,
     stats,
     earn,
+    advanceEra,
     pickTicket,
     abandonTicket,
     completeTicket,

@@ -1,7 +1,8 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useGameState, pendingLegacy } from './useGameState.js'
 import { UPGRADES, upgradeCost } from './upgrades.js'
 import { CLIENTS } from './data/clients.js'
+import { getEra, nextEra } from './data/eras.js'
 import { ticketTypeName } from './tickets.js'
 import TypingPane from './TypingPane.jsx'
 import TicketBoard from './TicketBoard.jsx'
@@ -50,6 +51,7 @@ export default function App() {
     pickTicket,
     abandonTicket,
     completeTicket,
+    advanceEra,
     buy,
     reset,
   } = useGameState()
@@ -61,10 +63,26 @@ export default function App() {
   const client = ticket && CLIENTS.find((c) => c.id === ticket.clientId)
   const legacy = pendingLegacy(state)
 
+  const era = getEra(state.era)
+  const next = nextEra(state.era)
+  const eraDone = state.proficiency[state.era] ?? 0
+  const eraReady =
+    era.ticketsToAdvance != null && next && eraDone >= era.ticketsToAdvance
+
+  // Era themes hook onto this attribute (see App.css [data-era] blocks).
+  useEffect(() => {
+    document.documentElement.dataset.era = state.era
+  }, [state.era])
+
   return (
     <div className="app">
       <header>
-        <h1>~/typing-terminal</h1>
+        <h1>
+          ~/typing-terminal
+          <span className="era-badge">
+            {era.name} · {era.year}
+          </span>
+        </h1>
         <div className="currency">
           <span className="loc">{fmt(state.currencies.loc)} LoC</span>
           <span className="money">${fmt(state.currencies.money)}</span>
@@ -80,6 +98,37 @@ export default function App() {
       {state.offlineEarned > 0 && (
         <div className="offline-banner">
           Your interns wrote {fmt(state.offlineEarned)} LoC while you were away.
+        </div>
+      )}
+
+      {era.ticketsToAdvance != null && next && (
+        <div className="era-progress">
+          <div className="era-progress-label">
+            <span>
+              {era.name}: {Math.min(eraDone, era.ticketsToAdvance)}/
+              {era.ticketsToAdvance} tickets to {next.name}
+            </span>
+            {eraReady && (
+              <button
+                className="era-advance"
+                onClick={() =>
+                  confirm(
+                    `Move on to the ${next.name}? New tech, new clients, new bugs.`
+                  ) && advanceEra()
+                }
+              >
+                Advance to {next.name} →
+              </button>
+            )}
+          </div>
+          <div className="era-progress-bar">
+            <div
+              className="era-progress-fill"
+              style={{
+                width: `${Math.min(100, (eraDone / era.ticketsToAdvance) * 100)}%`,
+              }}
+            />
+          </div>
         </div>
       )}
 
@@ -137,6 +186,16 @@ export default function App() {
           </button>
         </aside>
       </main>
+
+      <footer>
+        <span className="era-tagline">“{era.tagline}”</span>
+        {state.era === 'html' && (
+          <span className="visitor-counter">
+            You are visitor #
+            {String(Math.floor(state.lifetimeLoc)).padStart(6, '0')}
+          </span>
+        )}
+      </footer>
     </div>
   )
 }

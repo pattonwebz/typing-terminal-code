@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { TIERS } from './snippets.js'
+import { floatText } from './effects.js'
 
 const COMPLETION_BONUS_PER_CHAR = 2
 
@@ -9,6 +10,7 @@ export default function TypingPane({ snippet, stats, onEarn, onComplete }) {
   const [pos, setPos] = useState(0)
   const [combo, setCombo] = useState(0)
   const [lastEvent, setLastEvent] = useState(null) // 'crit' | 'miss' | 'done'
+  const paneRef = useRef(null)
 
   const tier = TIERS[snippet.tier]
   const comboMult = 1 + (combo / 50) * stats.comboBoost
@@ -34,6 +36,7 @@ export default function TypingPane({ snippet, stats, onEarn, onComplete }) {
       }
 
       const crit = Math.random() < stats.critChance
+      if (crit) floatText('CRIT! 10x', 'crit', paneRef.current)
       const amount =
         stats.perChar *
         stats.multiplier *
@@ -53,6 +56,7 @@ export default function TypingPane({ snippet, stats, onEarn, onComplete }) {
         )
         onEarn(bonus)
         setLastEvent('done')
+        floatText(`shipped! +${bonus} LoC`, 'done', paneRef.current)
         onComplete()
       } else {
         setPos(pos + 1)
@@ -63,7 +67,7 @@ export default function TypingPane({ snippet, stats, onEarn, onComplete }) {
   }, [snippet, pos, stats, tier, comboMult, onEarn, onComplete])
 
   return (
-    <div className="typing-pane">
+    <div className="typing-pane" ref={paneRef}>
       <div className="typing-meta">
         <span className={`tier tier-${snippet.tier}`}>{tier.name}</span>
         <span className={`combo ${lastEvent === 'miss' ? 'combo-broken' : ''}`}>

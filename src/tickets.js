@@ -26,7 +26,7 @@ export function createTicket(eraId, totalLoc, excludeCode) {
   const era = getEra(eraId)
   const type = weightedType()
   const client = pick(clientsForEra(eraId))
-  const snippet = randomSnippet(totalLoc, excludeCode)
+  const snippet = randomSnippet(era.snippetPool, totalLoc, excludeCode)
   return {
     id: `t-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
     type: type.id,

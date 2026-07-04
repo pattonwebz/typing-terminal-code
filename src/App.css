@@ -1,3 +1,5 @@
+/* Base (Framework-era / dark IDE) theme. Era themes only redefine these
+   variables via [data-era] — components must never be restyled per era. */
 :root {
   --bg: #0d1117;
   --panel: #161b22;
@@ -8,6 +10,54 @@
   --amber: #d29922;
   --red: #f85149;
   --blue: #58a6ff;
+  --font-code: 'Fira Code', 'JetBrains Mono', ui-monospace, monospace;
+  --font-ui: var(--font-code);
+  --radius: 6px;
+}
+
+/* HTML era: Geocities energy. */
+:root[data-era='html'] {
+  --bg: #c0c0c0;
+  --panel: #d4d0c8;
+  --border: #808080;
+  --text: #000000;
+  --dim: #444444;
+  --green: #006400;
+  --amber: #8b0000;
+  --red: #cc0000;
+  --blue: #000080;
+  --font-ui: 'Times New Roman', Times, serif;
+  --radius: 0px;
+}
+
+/* PHP era: phpBB beige and blue. */
+:root[data-era='php'] {
+  --bg: #e5e5e5;
+  --panel: #f5f5dc;
+  --border: #7a92ad;
+  --text: #1a1a1a;
+  --dim: #55606c;
+  --green: #1f7a1f;
+  --amber: #b8860b;
+  --red: #b22222;
+  --blue: #22559c;
+  --font-ui: Verdana, Geneva, sans-serif;
+  --radius: 3px;
+}
+
+/* JS era: early-2010s flat design (placeholder until step 7 polish). */
+:root[data-era='js'] {
+  --bg: #ecf0f1;
+  --panel: #ffffff;
+  --border: #bdc3c7;
+  --text: #2c3e50;
+  --dim: #7f8c8d;
+  --green: #27ae60;
+  --amber: #f39c12;
+  --red: #e74c3c;
+  --blue: #2980b9;
+  --font-ui: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --radius: 4px;
 }
 
 * {
@@ -18,7 +68,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: 'Fira Code', 'JetBrains Mono', ui-monospace, monospace;
+  font-family: var(--font-ui);
 }
 
 .app {
@@ -69,7 +119,7 @@ h1 {
 .offline-banner {
   background: var(--panel);
   border: 1px solid var(--green);
-  border-radius: 6px;
+  border-radius: var(--radius);
   padding: 0.6rem 1rem;
   margin-bottom: 1rem;
   color: var(--green);
@@ -99,7 +149,7 @@ main {
 .ticket-type {
   color: var(--blue);
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: calc(var(--radius) / 1.5);
   padding: 0.05rem 0.4rem;
 }
 
@@ -117,7 +167,7 @@ main {
 .typing-pane {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: calc(var(--radius) + 2px);
   padding: 1.25rem;
 }
 
@@ -158,6 +208,7 @@ main {
 }
 
 .snippet {
+  font-family: var(--font-code);
   font-size: 1.1rem;
   line-height: 1.7;
   white-space: pre-wrap;
@@ -193,7 +244,7 @@ main {
   margin-left: 0.6rem;
   background: none;
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: calc(var(--radius) / 1.5);
   color: var(--dim);
   font-family: inherit;
   font-size: 0.75rem;
@@ -209,7 +260,7 @@ main {
 .no-ticket {
   background: var(--panel);
   border: 1px dashed var(--border);
-  border-radius: 8px;
+  border-radius: calc(var(--radius) + 2px);
   padding: 2rem;
   text-align: center;
   color: var(--dim);
@@ -246,7 +297,7 @@ main {
   text-align: left;
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: var(--radius);
   padding: 0.6rem 0.7rem;
   color: var(--text);
   font-family: inherit;
@@ -310,7 +361,7 @@ main {
   text-align: left;
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: var(--radius);
   padding: 0.6rem 0.8rem;
   margin-bottom: 0.5rem;
   color: var(--text);
@@ -352,7 +403,7 @@ main {
   background: none;
   border: 1px solid var(--border);
   color: var(--dim);
-  border-radius: 6px;
+  border-radius: var(--radius);
   padding: 0.4rem 0.8rem;
   font-family: inherit;
   cursor: pointer;
@@ -361,4 +412,102 @@ main {
 .reset:hover {
   border-color: var(--red);
   color: var(--red);
+}
+
+
+/* Era header/progress/footer */
+.era-badge {
+  margin-left: 0.8rem;
+  font-size: 0.75rem;
+  color: var(--dim);
+  font-weight: normal;
+}
+
+.era-progress {
+  margin-bottom: 1rem;
+}
+
+.era-progress-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: var(--dim);
+  margin-bottom: 0.3rem;
+}
+
+.era-advance {
+  background: var(--green);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-weight: bold;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  50% { opacity: 0.75; }
+}
+
+.era-progress-bar {
+  height: 6px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.era-progress-fill {
+  height: 100%;
+  background: var(--blue);
+  transition: width 0.3s;
+}
+
+footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  color: var(--dim);
+  font-size: 0.8rem;
+}
+
+.visitor-counter {
+  font-family: var(--font-code);
+  background: #000;
+  color: #0f0;
+  padding: 0.1rem 0.4rem;
+}
+
+/* Effects layer */
+.fx-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.fx-float {
+  position: absolute;
+  font-family: var(--font-code);
+  font-weight: bold;
+  animation: fx-rise 1.1s ease-out forwards;
+}
+
+.fx-gain { color: var(--green); }
+.fx-crit { color: var(--amber); font-size: 1.2rem; }
+.fx-done { color: var(--green); font-size: 1.1rem; }
+.fx-bad  { color: var(--red); }
+
+@keyframes fx-rise {
+  from { transform: translateY(0); opacity: 1; }
+  to   { transform: translateY(-60px); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-float, .era-advance { animation: none; }
 }

@@ -14,6 +14,7 @@ export const ERAS = [
     order: 0,
     payMultiplier: 1,
     snippetPool: 'html',
+    ticketsToAdvance: 8,
     proficiency: { startShipRate: 0.3, minShipRate: 0.05, ticketsToMaster: 30 },
   },
   {
@@ -24,6 +25,7 @@ export const ERAS = [
     order: 1,
     payMultiplier: 2.5,
     snippetPool: 'php',
+    ticketsToAdvance: 12,
     proficiency: { startShipRate: 0.35, minShipRate: 0.05, ticketsToMaster: 35 },
   },
   {
@@ -34,6 +36,7 @@ export const ERAS = [
     order: 2,
     payMultiplier: 6,
     snippetPool: 'js',
+    ticketsToAdvance: 16,
     proficiency: { startShipRate: 0.4, minShipRate: 0.06, ticketsToMaster: 40 },
   },
   {
@@ -44,6 +47,7 @@ export const ERAS = [
     order: 3,
     payMultiplier: 15,
     snippetPool: 'spa',
+    ticketsToAdvance: 20,
     proficiency: { startShipRate: 0.4, minShipRate: 0.08, ticketsToMaster: 45 },
   },
   {
@@ -54,6 +58,7 @@ export const ERAS = [
     order: 4,
     payMultiplier: 40,
     snippetPool: 'ai',
+    ticketsToAdvance: null,
     proficiency: { startShipRate: 0.6, minShipRate: 0.3, ticketsToMaster: 60 },
   },
 ]
